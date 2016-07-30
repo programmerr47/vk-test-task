@@ -3,7 +3,6 @@ package com.github.programmerr47.vkdiscussionviewer.views;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.graphics.Typeface;
 import android.os.Build;
 import android.util.AttributeSet;
 import android.widget.TextView;
@@ -11,7 +10,7 @@ import android.widget.TextView;
 import com.github.programmerr47.vkdiscussionviewer.Constants.Font;
 import com.github.programmerr47.vkdiscussionviewer.R;
 
-import static com.github.programmerr47.vkdiscussionviewer.AndroidUtils.assetsTypeface;
+import static com.github.programmerr47.vkdiscussionviewer.AssetsTypefaceStorage.assetsTypefaceStorage;
 
 /**
  * @author Michael Spitsin
@@ -42,7 +41,7 @@ public class CustomFontTextView extends TextView {
     public void setFont(Font font) {
         if (this.font != font && font != null && font.getFontName() != null) {
             this.font = font;
-            setTypeface(assetsTypeface(getContext(), font));
+            setTypeface(assetsTypefaceStorage().get(font));
         }
     }
 }

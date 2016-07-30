@@ -22,6 +22,10 @@ public class Constants {
             return fontName;
         }
 
+        public int getId() {
+            return id;
+        }
+
         public static Font fromId(int id) {
             if (id == ROBOTO_REGULAR.id) {
                 return ROBOTO_REGULAR;

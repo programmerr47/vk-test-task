@@ -23,7 +23,6 @@ public class AndroidUtils {
         return assetsTypeface(appContext(), font);
     }
 
-    //todo add cache of typefaces
     public static Typeface assetsTypeface(Context context, Constants.Font font) {
         return Typeface.createFromAsset(context.getAssets(), Constants.ASSETS_FONTS_DIR + font.getFontName());
     }
