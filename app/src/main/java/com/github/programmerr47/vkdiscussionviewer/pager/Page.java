@@ -1,16 +1,12 @@
 package com.github.programmerr47.vkdiscussionviewer.pager;
 
 import android.content.Context;
-import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.FrameLayout;
 
 import com.github.programmerr47.vkdiscussionviewer.R;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static com.github.programmerr47.vkdiscussionviewer.AndroidUtils.color;
@@ -19,42 +15,17 @@ import static com.github.programmerr47.vkdiscussionviewer.AndroidUtils.color;
  * @author Michael Spitsin
  * @since 2/10/2016.
  */
-public abstract class Page {
-
-    public static final int VEIL_ID = 1;
-
-    private View pageView;
+public abstract class Page extends UiControl {
     protected PagerListener pagerListener;
 
     protected boolean isTransitionAnimating;
-    protected final List<Runnable> uiWorks = new ArrayList<>();
-    protected final UpClickListener closePageListener = new UpClickListener();
+    protected final ClosePageListener closePageListener = new ClosePageListener();
 
-    protected Toolbar toolbar;
-
-    public View createView(Context context) {
+    public View prepare(Context context) {
         View originPageView = onCreateView(context);
-        pageView = wrapPageView(context, originPageView);
+        view = wrapPageView(context, originPageView);
         onViewCreated(originPageView);
-        return pageView;
-    }
-
-    public void onCreate() {}
-
-    public abstract View onCreateView(Context context);
-
-    public void onViewCreated(View pageView) {}
-
-    public void onResume() {
-        executeAllWorks();
-    }
-
-    public void onPause() {}
-
-    public void onDestroy() {}
-
-    public View getPageView() {
-        return pageView;
+        return view;
     }
 
     public void setPagerListener(PagerListener pagerListener) {
@@ -93,17 +64,7 @@ public abstract class Page {
         return wrapperLayout;
     }
 
-    private void executeAllWorks() {
-        if (uiWorks.size() > 0) {
-            for (Runnable runnable : uiWorks) {
-                runnable.run();
-            }
-
-            uiWorks.clear();
-        }
-    }
-
-    protected final class UpClickListener implements OnClickListener {
+    protected final class ClosePageListener implements OnClickListener {
 
         @Override
         public void onClick(View v) {
