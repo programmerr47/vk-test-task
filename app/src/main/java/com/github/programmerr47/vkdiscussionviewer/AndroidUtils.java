@@ -2,6 +2,7 @@ package com.github.programmerr47.vkdiscussionviewer;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.Typeface;
 import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
 import android.support.annotation.NonNull;
@@ -17,6 +18,15 @@ import static com.github.programmerr47.vkdiscussionviewer.VkApplication.appConte
  */
 public class AndroidUtils {
     private AndroidUtils() {}
+
+    public static Typeface assetsTypeface(Constants.Font font) {
+        return assetsTypeface(appContext(), font);
+    }
+
+    //todo add cache of typefaces
+    public static Typeface assetsTypeface(Context context, Constants.Font font) {
+        return Typeface.createFromAsset(context.getAssets(), Constants.ASSETS_FONTS_DIR + font.getFontName());
+    }
 
     public static String string(int id, Object... formatArgs) {
         return string(appContext(), id, formatArgs);

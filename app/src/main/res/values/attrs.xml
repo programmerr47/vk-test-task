@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="CustomFontTextView">
+        <attr name="fontName" format="enum">
+            <enum name="roboto_regular" value="0"/>
+            <enum name="roboto_medium" value="1"/>
+        </attr>
+    </declare-styleable>
+</resources>
