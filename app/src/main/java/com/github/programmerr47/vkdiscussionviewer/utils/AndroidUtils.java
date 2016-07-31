@@ -1,4 +1,4 @@
-package com.github.programmerr47.vkdiscussionviewer;
+package com.github.programmerr47.vkdiscussionviewer.utils;
 
 import android.content.Context;
 import android.content.res.Resources;

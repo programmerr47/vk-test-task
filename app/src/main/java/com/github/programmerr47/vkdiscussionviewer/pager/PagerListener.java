@@ -7,5 +7,4 @@ package com.github.programmerr47.vkdiscussionviewer.pager;
 public interface PagerListener {
     void openPage(Page newPage);
     void closePage();
-    void openDrawer();
 }

@@ -1,4 +1,4 @@
-package com.github.programmerr47.vkdiscussionviewer;
+package com.github.programmerr47.vkdiscussionviewer.utils;
 
 /**
  * @author Michael Spitsin

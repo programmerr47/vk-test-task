@@ -9,7 +9,7 @@ import android.widget.FrameLayout;
 import com.github.programmerr47.vkdiscussionviewer.R;
 
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
-import static com.github.programmerr47.vkdiscussionviewer.AndroidUtils.color;
+import static com.github.programmerr47.vkdiscussionviewer.utils.AndroidUtils.color;
 
 /**
  * @author Michael Spitsin

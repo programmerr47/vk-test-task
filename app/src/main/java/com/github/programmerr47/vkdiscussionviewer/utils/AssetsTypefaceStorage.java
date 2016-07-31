@@ -1,9 +1,7 @@
-package com.github.programmerr47.vkdiscussionviewer;
+package com.github.programmerr47.vkdiscussionviewer.utils;
 
 import android.graphics.Typeface;
 import android.util.SparseArray;
-
-import com.github.programmerr47.vkdiscussionviewer.Constants.Font;
 
 /**
  * @author Michael Spitsin
@@ -18,7 +16,7 @@ public enum AssetsTypefaceStorage {
 
     private final SparseArray<Typeface> typefaces = new SparseArray<>();
 
-    public Typeface get(Font font) {
+    public Typeface get(Constants.Font font) {
         Typeface cached = typefaces.get(font.getId());
 
         if (cached == null) {

@@ -7,10 +7,10 @@ import android.os.Build;
 import android.util.AttributeSet;
 import android.widget.TextView;
 
-import com.github.programmerr47.vkdiscussionviewer.Constants.Font;
+import com.github.programmerr47.vkdiscussionviewer.utils.Constants.Font;
 import com.github.programmerr47.vkdiscussionviewer.R;
 
-import static com.github.programmerr47.vkdiscussionviewer.AssetsTypefaceStorage.assetsTypefaceStorage;
+import static com.github.programmerr47.vkdiscussionviewer.utils.AssetsTypefaceStorage.assetsTypefaceStorage;
 
 /**
  * @author Michael Spitsin
