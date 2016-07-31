@@ -4,12 +4,14 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-import com.github.programmerr47.vkdiscussionviewer.chatpage.ChatPage;
+import com.github.programmerr47.vkdiscussionviewer.chatpage.ChatListPage;
 import com.vk.sdk.VKAccessToken;
 import com.vk.sdk.VKCallback;
 import com.vk.sdk.VKScope;
 import com.vk.sdk.VKSdk;
+import com.vk.sdk.api.VKApi;
 import com.vk.sdk.api.VKError;
+import com.vk.sdk.util.VKUtil;
 
 public class AppActivity extends AppCompatActivity {
 
@@ -21,8 +23,12 @@ public class AppActivity extends AppCompatActivity {
         setContentView(R.layout.activity_app);
         appFragment = (AppFragment) getFragmentManager().findFragmentById(R.id.app_fragment);
 
+        //String[] str = VKUtil.getCertificateFingerprint(this, "com.github.programmerr47.vkdiscussionviewer");
+
         if (!VKSdk.isLoggedIn()) {
             VKSdk.login(this, VKScope.MESSAGES, VKScope.FRIENDS);
+        } else {
+            appFragment.init(new ChatListPage());
         }
     }
 
@@ -40,7 +46,7 @@ public class AppActivity extends AppCompatActivity {
         if (!VKSdk.onActivityResult(requestCode, resultCode, data, new VKCallback<VKAccessToken>() {
             @Override
             public void onResult(VKAccessToken res) {
-                appFragment.init(new ChatPage());
+                appFragment.init(new ChatListPage());
             }
 
             @Override

@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Vk Discussion Viewer</string>
+    <string name="chat.list.empty">There is no discussions</string>
 </resources>

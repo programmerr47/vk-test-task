@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.github.programmerr47.vkgroups.view.VkViewPager
+    <com.github.programmerr47.vkdiscussionviewer.views.VkViewPager
         android:id="@+id/app_pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>

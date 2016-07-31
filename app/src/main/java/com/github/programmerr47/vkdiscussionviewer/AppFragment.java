@@ -12,7 +12,6 @@ import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Interpolator;
 
-import com.github.programmerr47.vkdiscussionviewer.chatpage.ChatPage;
 import com.github.programmerr47.vkdiscussionviewer.pager.FixedSpeedScroller;
 import com.github.programmerr47.vkdiscussionviewer.pager.Page;
 import com.github.programmerr47.vkdiscussionviewer.pager.PagerListener;
@@ -69,13 +68,17 @@ public class AppFragment extends Fragment implements PagerListener, ViewPager.On
     @Override
     public void onResume() {
         super.onResume();
-        pages.get(pages.size() - 1).onResume();
+        if (!pages.isEmpty()) {
+            pages.get(pages.size() - 1).onResume();
+        }
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        pages.get(pages.size() - 1).onPause();
+        if (!pages.isEmpty()) {
+            pages.get(pages.size() - 1).onPause();
+        }
     }
 
     @Override
@@ -133,7 +136,11 @@ public class AppFragment extends Fragment implements PagerListener, ViewPager.On
     }
 
     public void init(Page rootPage) {
-        openPage(rootPage);
+        rootPage.onCreate();
+        rootPage.setPagerListener(this);
+        rootPage.prepare(getActivity());
+        adapter.addPage(rootPage);
+        pager.setCurrentItem(0, false);
     }
 
     public boolean hasBackStack() {

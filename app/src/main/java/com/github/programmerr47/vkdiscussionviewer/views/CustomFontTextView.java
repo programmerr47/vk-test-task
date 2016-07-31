@@ -21,6 +21,21 @@ public class CustomFontTextView extends TextView {
 
     private Font font;
 
+    public CustomFontTextView(Context context) {
+        super(context);
+        init(null);
+    }
+
+    public CustomFontTextView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        init(attrs);
+    }
+
+    public CustomFontTextView(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+        init(attrs);
+    }
+
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public CustomFontTextView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);

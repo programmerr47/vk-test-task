@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="76dp"
+    android:paddingTop="14dp"
+    android:paddingBottom="6dp"
+    android:paddingLeft="16dp"
+    android:paddingStart="16dp"
+    android:paddingRight="16dp"
+    android:paddingEnd="16dp"
+    android:background="@android:color/white">
+
+    <ImageView
+        android:id="@+id/avatar"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:background="#ff0000"/>
+
+    <com.github.programmerr47.vkdiscussionviewer.views.CustomFontTextView
+        android:id="@+id/time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:text="04:43"
+        android:textSize="14sp"
+        android:textColor="@color/text_secondary"
+        android:layout_alignBaseline="@id/title"/>
+
+    <com.github.programmerr47.vkdiscussionviewer.views.CustomFontTextView
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="26dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@id/avatar"
+        android:layout_toLeftOf="@id/time"
+        android:text="Пример названия настолько длинного, что оно не помещяется в одну строчку"
+        android:textSize="17sp"
+        android:textColor="@color/text_primary"
+        android:gravity="bottom"
+        android:singleLine="true"
+        app:fontName="roboto_medium"/>
+
+    <com.github.programmerr47.vkdiscussionviewer.views.CustomFontTextView
+        android:id="@+id/last_message"
+        android:layout_width="match_parent"
+        android:layout_height="26dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_alignParentBottom="true"
+        android:layout_toRightOf="@id/avatar"
+        android:text="Просто текст и ничего больше"
+        android:textSize="15sp"
+        android:textColor="@color/text_secondary"
+        android:singleLine="true"
+        app:fontName="roboto_regular"/>
+
+</RelativeLayout>
