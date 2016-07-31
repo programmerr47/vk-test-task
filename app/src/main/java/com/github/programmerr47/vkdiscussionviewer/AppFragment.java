@@ -1,7 +1,6 @@
 package com.github.programmerr47.vkdiscussionviewer;
 
 import android.app.Fragment;
-import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.view.PagerAdapter;
@@ -39,10 +38,6 @@ public class AppFragment extends Fragment implements PagerListener, ViewPager.On
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
 
-        Page groupListPage = new ChatPage(); //TODO
-        groupListPage.onCreate();
-        groupListPage.setPagerListener(this);
-        pages.add(groupListPage);
         adapter = new VkPageAdapter(pages);
     }
 
@@ -137,12 +132,12 @@ public class AppFragment extends Fragment implements PagerListener, ViewPager.On
         }
     }
 
-    public boolean hasBackStack() {
-        return pages.size() > 1 || pages.get(0).hasBackStack();
+    public void init(Page rootPage) {
+        openPage(rootPage);
     }
 
-    public Page getOpenedPage() {
-        return pages.get(pages.size() - 1);
+    public boolean hasBackStack() {
+        return pages.size() > 1 || pages.get(0).hasBackStack();
     }
 
     public void onBackPressed() {
