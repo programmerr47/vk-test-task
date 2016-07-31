@@ -14,10 +14,16 @@ import com.github.programmerr47.vkdiscussionviewer.pager.Page;
  */
 public final class ChatListPage extends Page {
 
+    private final ChatListUpdater updater = new ChatListUpdater();
     private RecyclerView recyclerView;
 
     @Override
     public View onCreateView(Context context) {
         return LayoutInflater.from(context).inflate(R.layout.page_chat_list, null);
+    }
+
+    @Override
+    public void onViewCreated(View pageView) {
+        updater.requestChats();
     }
 }

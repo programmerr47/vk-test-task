@@ -12,11 +12,13 @@ import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Interpolator;
 
+import com.github.programmerr47.vkdiscussionviewer.chatpage.ChatListPage;
 import com.github.programmerr47.vkdiscussionviewer.pager.FixedSpeedScroller;
 import com.github.programmerr47.vkdiscussionviewer.pager.Page;
 import com.github.programmerr47.vkdiscussionviewer.pager.PagerListener;
 import com.github.programmerr47.vkdiscussionviewer.pager.VkPageTransformerAuto;
 import com.github.programmerr47.vkdiscussionviewer.pager.VkPagerTransformerManual;
+import com.vk.sdk.VKSdk;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -37,6 +39,12 @@ public class AppFragment extends Fragment implements PagerListener, ViewPager.On
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
 
+        if (VKSdk.isLoggedIn()) {
+            Page rootPage = createRootPage();
+            rootPage.onCreate();
+            rootPage.setPagerListener(this);
+            pages.add(rootPage);
+        }
         adapter = new VkPageAdapter(pages);
     }
 
@@ -135,7 +143,8 @@ public class AppFragment extends Fragment implements PagerListener, ViewPager.On
         }
     }
 
-    public void init(Page rootPage) {
+    public void init() {
+        Page rootPage = createRootPage();
         rootPage.onCreate();
         rootPage.setPagerListener(this);
         rootPage.prepare(getActivity());
@@ -153,6 +162,10 @@ public class AppFragment extends Fragment implements PagerListener, ViewPager.On
         } else {
             setCurrentPage(pages.size() - 2, true);
         }
+    }
+
+    private Page createRootPage() {
+        return new ChatListPage();
     }
 
     private void setCustomScroller(Interpolator interpolator) {

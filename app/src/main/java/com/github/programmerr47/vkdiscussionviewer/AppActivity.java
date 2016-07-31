@@ -26,9 +26,7 @@ public class AppActivity extends AppCompatActivity {
         //String[] str = VKUtil.getCertificateFingerprint(this, "com.github.programmerr47.vkdiscussionviewer");
 
         if (!VKSdk.isLoggedIn()) {
-            VKSdk.login(this, VKScope.MESSAGES, VKScope.FRIENDS);
-        } else {
-            appFragment.init(new ChatListPage());
+            VKSdk.login(this, VKScope.MESSAGES);
         }
     }
 
@@ -46,7 +44,7 @@ public class AppActivity extends AppCompatActivity {
         if (!VKSdk.onActivityResult(requestCode, resultCode, data, new VKCallback<VKAccessToken>() {
             @Override
             public void onResult(VKAccessToken res) {
-                appFragment.init(new ChatListPage());
+                appFragment.init();
             }
 
             @Override

@@ -43,6 +43,8 @@ public class VKApiMessage extends VKApiModel implements Identifiable, android.os
      */
     public int id;
 
+    public int chat_id;
+
     /**
      * For an incoming message, the user ID of the author. For an outgoing message, the user ID of the receiver.
      */
@@ -102,6 +104,7 @@ public class VKApiMessage extends VKApiModel implements Identifiable, android.os
      */
     public VKApiMessage parse(JSONObject source) throws JSONException {
         id = source.optInt("id");
+        chat_id = source.optInt("chat_id");
         user_id = source.optInt("user_id");
         date = source.optLong("date");
         read_state = ParseUtils.parseBoolean(source, "read_state");
@@ -120,6 +123,7 @@ public class VKApiMessage extends VKApiModel implements Identifiable, android.os
      */
     public VKApiMessage(Parcel in) {
         this.id = in.readInt();
+        this.chat_id = in.readInt();
         this.user_id = in.readInt();
         this.date = in.readLong();
         this.read_state = in.readByte() != 0;
@@ -152,6 +156,7 @@ public class VKApiMessage extends VKApiModel implements Identifiable, android.os
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(this.id);
+        dest.writeInt(this.chat_id);
         dest.writeInt(this.user_id);
         dest.writeLong(this.date);
         dest.writeByte(read_state ? (byte) 1 : (byte) 0);
