@@ -1,4 +1,4 @@
-package com.github.programmerr47.vkdiscussionviewer.chatpage;
+package com.github.programmerr47.vkdiscussionviewer.chatlistpage;
 
 import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
@@ -31,17 +31,25 @@ import java.util.concurrent.Executors;
 public final class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatItemHolder> {
     private final Loader loader = new Loader();
     private final AdapterItemsUpdater itemsUpdater = new AdapterItemsUpdater(this);
+
+    private final OnChatClickedListener listener;
+
     private List<ChatItem> chatItems = Collections.emptyList();
+
+    public ChatListAdapter(OnChatClickedListener listener) {
+        this.listener = listener;
+    }
 
     @Override
     public ChatItemHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        return new ChatItemHolder(inflater.inflate(R.layout.item_chat, null));
+        return new ChatItemHolder(inflater.inflate(R.layout.item_chat, null), listener);
     }
 
     @Override
     public void onBindViewHolder(ChatItemHolder holder, int position) {
-        ChatItem item = chatItems.get(position);
+        final ChatItem item = chatItems.get(position);
+        holder.bindChatId(item.getChatId());
 
         loader.load(item, holder.avatarView);
         holder.lastMessageView.setText(item.getLastMessage());
@@ -60,14 +68,30 @@ public final class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.
         itemsUpdater.updateItems(0, chatItems.size(), lastSize);
     }
 
-    public static final class ChatItemHolder extends BindViewHolder {
+    public static final class ChatItemHolder extends BindViewHolder implements View.OnClickListener {
         final ImageView avatarView = bind(R.id.avatar);
         final TextView titleView = bind(R.id.title);
         final TextView lastMessageView = bind(R.id.last_message);
         final TextView timeView = bind(R.id.time);
 
-        public ChatItemHolder(View rootView) {
+        final OnChatClickedListener listener;
+
+        int chatId;
+
+        public ChatItemHolder(View rootView, OnChatClickedListener listener) {
             super(rootView);
+            this.listener = listener;
+            rootView.setOnClickListener(this);
+        }
+
+        public void bindChatId(int chatId) {
+            this.chatId = chatId;
+        }
+
+
+        @Override
+        public void onClick(View view) {
+            listener.onChatClicked(chatId);
         }
     }
 
@@ -99,5 +123,9 @@ public final class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.
                 }
             });
         }
+    }
+
+    public interface OnChatClickedListener {
+        void onChatClicked(int chatId);
     }
 }

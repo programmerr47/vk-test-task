@@ -1,25 +1,21 @@
-package com.github.programmerr47.vkdiscussionviewer.chatpage;
+package com.github.programmerr47.vkdiscussionviewer.chatlistpage;
 
 import android.content.Context;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.SpannableStringBuilder;
-import android.text.Spanned;
 import android.text.style.AbsoluteSizeSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.github.programmerr47.vkdiscussionviewer.R;
+import com.github.programmerr47.vkdiscussionviewer.chatlistpage.ChatListAdapter.OnChatClickedListener;
 import com.github.programmerr47.vkdiscussionviewer.pager.Page;
-import com.github.programmerr47.vkdiscussionviewer.utils.AndroidUtils;
-import com.github.programmerr47.vkdiscussionviewer.utils.AnimationUtils;
-import com.github.programmerr47.vkdiscussionviewer.utils.Constants;
 import com.github.programmerr47.vkdiscussionviewer.utils.CustomTypefaceSpan;
-import com.squareup.picasso.Picasso;
-import com.vk.sdk.api.VKApi;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,16 +27,15 @@ import static com.github.programmerr47.vkdiscussionviewer.utils.AndroidUtils.str
 import static com.github.programmerr47.vkdiscussionviewer.utils.AnimationUtils.hideView;
 import static com.github.programmerr47.vkdiscussionviewer.utils.AnimationUtils.showView;
 import static com.github.programmerr47.vkdiscussionviewer.utils.Constants.Font.ROBOTO_MEDIUM;
-import static com.github.programmerr47.vkdiscussionviewer.utils.Constants.Font.ROBOTO_REGULAR;
 
 /**
  * @author Michael Spitsin
  * @since 2016-07-31
  */
-public final class ChatListPage extends Page implements OnChatsPreparedListener {
+public final class ChatListPage extends Page implements OnChatsPreparedListener, OnChatClickedListener {
 
     private final ChatListUpdater updater = new ChatListUpdater(this);
-    private ChatListAdapter adapter = new ChatListAdapter();
+    private ChatListAdapter adapter = new ChatListAdapter(this);
     private List<ChatItem> chats = new ArrayList<>();
     private boolean isChatsLoaded;
 
@@ -88,6 +83,11 @@ public final class ChatListPage extends Page implements OnChatsPreparedListener 
         if (chats.isEmpty()) {
             showView(emptyListLabel);
         }
+    }
+
+    @Override
+    public void onChatClicked(int chatId) {
+        Toast.makeText(view.getContext(), "Chat id = " + chatId, Toast.LENGTH_SHORT).show();
     }
 
     private void prepareToolbar() {

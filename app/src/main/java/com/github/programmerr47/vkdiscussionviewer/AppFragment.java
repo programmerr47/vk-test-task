@@ -12,7 +12,7 @@ import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Interpolator;
 
-import com.github.programmerr47.vkdiscussionviewer.chatpage.ChatListPage;
+import com.github.programmerr47.vkdiscussionviewer.chatlistpage.ChatListPage;
 import com.github.programmerr47.vkdiscussionviewer.pager.FixedSpeedScroller;
 import com.github.programmerr47.vkdiscussionviewer.pager.Page;
 import com.github.programmerr47.vkdiscussionviewer.pager.PagerListener;

@@ -33,11 +33,11 @@ public class BitmapUtils {
                 case 3:
                     return transform(
                             cropToHalf(avatars.get(0)),
-                            halfDown(avatars.get(1)), halfDown(avatars.get(2)));
+                            avatars.get(1), avatars.get(2));
                 default:
                     return transform(
-                            halfDown(avatars.get(0)), halfDown(avatars.get(1)),
-                            halfDown(avatars.get(2)), halfDown(avatars.get(3)));
+                            avatars.get(0), avatars.get(1),
+                            avatars.get(2), avatars.get(3));
             }
         } else {
             return null;
@@ -126,9 +126,5 @@ public class BitmapUtils {
         int quadWidth = bitmap.getWidth() / 4;
         int halfWidth = bitmap.getWidth() / 2;
         return Bitmap.createBitmap(bitmap, quadWidth, 0, halfWidth,bitmap.getHeight());
-    }
-
-    private static Bitmap halfDown(Bitmap origin) {
-        return Bitmap.createScaledBitmap(origin, origin.getWidth() / 2, origin.getHeight() / 2, false);
     }
 }

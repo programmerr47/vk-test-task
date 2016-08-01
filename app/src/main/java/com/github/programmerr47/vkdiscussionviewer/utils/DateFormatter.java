@@ -20,6 +20,8 @@ public class DateFormatter {
     private static final String DAY_IN_YEAR_FORMAT = "EEE, d MMMM, k:mm";
     private static final String DEFAULT_FORMAT = "dd MMMM yyyy, k:mm";
 
+    private static Calendar source = Calendar.getInstance();
+
     //TODO make formats for english
 //    private static final String TIME_FORMAT = "h:mm aa";
 //    private static final String DAY_IN_YEAR_FORMAT = "EEE, MMMM d, h:mm aa";
@@ -34,12 +36,10 @@ public class DateFormatter {
     }
 
     public static String formatDateMillis(long dateMillis) {
-        Calendar sourceDate = Calendar.getInstance();
-        sourceDate.setTimeInMillis(dateMillis);
-
+        source.setTimeInMillis(dateMillis);
         Calendar now = Calendar.getInstance();
 
-        return capitalizeFistLetter(formatDateCompareTo(sourceDate, now));
+        return capitalizeFistLetter(formatDateCompareTo(source, now));
     }
 
     private static String formatDateCompareTo(Calendar sourceDate, Calendar comparedDate) {

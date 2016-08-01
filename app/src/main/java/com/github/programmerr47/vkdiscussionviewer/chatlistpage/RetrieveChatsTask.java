@@ -1,4 +1,4 @@
-package com.github.programmerr47.vkdiscussionviewer.chatpage;
+package com.github.programmerr47.vkdiscussionviewer.chatlistpage;
 
 import android.os.Handler;
 import android.os.Looper;
