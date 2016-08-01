@@ -61,6 +61,7 @@ public class ChatListUpdater implements OnChatsReceivedListener {
                         }
                     }
                     chatMap.get(Integer.parseInt(key)).setUrls(urls);
+                    chatMap.get(Integer.parseInt(key)).setParticipantsCount(jsonArray.length());
                 }
                 listener.onChatsReady(chats);
             }

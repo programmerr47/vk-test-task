@@ -4,6 +4,13 @@
     <string name="chat.list.empty">Бесед нет.</string>
     <string name="chat.list.title">Список бесед</string>
 
+    <plurals name="chat_participant">
+        <item quantity="one">%d участник</item>
+        <item quantity="few">%d участника</item>
+        <item quantity="many">%d участников</item>
+        <item quantity="other">%d участников</item>
+    </plurals>
+
     <!-- Dates -->
     <string name="today">Сегодня</string>
     <string name="yesterday">Вчера</string>

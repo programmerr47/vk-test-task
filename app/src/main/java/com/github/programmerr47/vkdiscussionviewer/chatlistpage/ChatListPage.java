@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import com.github.programmerr47.vkdiscussionviewer.R;
 import com.github.programmerr47.vkdiscussionviewer.chatlistpage.ChatListAdapter.OnChatClickedListener;
+import com.github.programmerr47.vkdiscussionviewer.chatpage.ChatPage;
 import com.github.programmerr47.vkdiscussionviewer.pager.Page;
 import com.github.programmerr47.vkdiscussionviewer.utils.CustomTypefaceSpan;
 
@@ -86,15 +87,15 @@ public final class ChatListPage extends Page implements OnChatsPreparedListener,
     }
 
     @Override
-    public void onChatClicked(int chatId) {
-        Toast.makeText(view.getContext(), "Chat id = " + chatId, Toast.LENGTH_SHORT).show();
+    public void onChatClicked(ChatItem chatItem) {
+        pagerListener.openPage(new ChatPage(chatItem));
     }
 
     private void prepareToolbar() {
         String toolbarTitleOrigin = string(toolbar.getContext(), R.string.chat_list_title);
         CustomTypefaceSpan robotoMediumSpan = new CustomTypefaceSpan(ROBOTO_MEDIUM);
         SpannableStringBuilder toolbarTitleBuilder = new SpannableStringBuilder(toolbarTitleOrigin);
-        toolbarTitleBuilder.setSpan(robotoMediumSpan, 0, toolbarTitleOrigin.length(), SPAN_EXCLUSIVE_EXCLUSIVE);
+        toolbarTitleBuilder.setSpan(robotoMediumSpan, 0, toolbarTitleBuilder.length(), SPAN_EXCLUSIVE_EXCLUSIVE);
         toolbarTitleBuilder.setSpan(new AbsoluteSizeSpan(20, true), 0, toolbarTitleBuilder.length(), SPAN_EXCLUSIVE_EXCLUSIVE);
         toolbar.setTitle(toolbarTitleBuilder);
     }

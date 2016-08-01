@@ -27,6 +27,14 @@ public class AndroidUtils {
         return Typeface.createFromAsset(context.getAssets(), Constants.ASSETS_FONTS_DIR + font.getFontName());
     }
 
+    public static String plural(int id, int quantity, Object... formatArgs) {
+        return plural(appContext(), id, quantity, formatArgs);
+    }
+
+    public static String plural(@NonNull Context context, int id, int quantity, Object... formatArgs) {
+        return context.getResources().getQuantityString(id, quantity, formatArgs);
+    }
+
     public static String string(int id, Object... formatArgs) {
         return string(appContext(), id, formatArgs);
     }

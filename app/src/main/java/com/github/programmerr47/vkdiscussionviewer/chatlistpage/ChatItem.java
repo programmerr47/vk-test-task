@@ -8,18 +8,14 @@ import java.util.List;
  */
 public class ChatItem {
     private int chatId;
-    private List<String> urls;
     private String title;
     private String lastMessage;
     private long date;
+    private List<String> urls;
+    private int participantsCount;
 
     ChatItem setChatId(int chatId) {
         this.chatId = chatId;
-        return this;
-    }
-
-    ChatItem setUrls(List<String> urls) {
-        this.urls = urls;
         return this;
     }
 
@@ -38,12 +34,18 @@ public class ChatItem {
         return this;
     }
 
-    public int getChatId() {
-        return chatId;
+    ChatItem setUrls(List<String> urls) {
+        this.urls = urls;
+        return this;
     }
 
-    public List<String> getUrls() {
-        return urls;
+    ChatItem setParticipantsCount(int count) {
+        this.participantsCount = count;
+        return this;
+    }
+
+    public int getChatId() {
+        return chatId;
     }
 
     public String getTitle() {
@@ -56,5 +58,13 @@ public class ChatItem {
 
     public long getDate() {
         return date;
+    }
+
+    public List<String> getUrls() {
+        return urls;
+    }
+
+    public int getParticipantsCount() {
+        return participantsCount;
     }
 }

@@ -10,8 +10,6 @@ import android.widget.Scroller;
  */
 public class FixedSpeedScroller extends Scroller {
 
-    private int mFraction = 1;
-
     public FixedSpeedScroller(Context context) {
         super(context);
     }
@@ -27,7 +25,7 @@ public class FixedSpeedScroller extends Scroller {
     @Override
     public void startScroll(int startX, int startY, int dx, int dy, int duration) {
         // Ignore received duration, use fixed one instead
-        super.startScroll(startX, startY, dx, dy, duration * mFraction);
+        super.startScroll(startX, startY, dx, dy, duration);
     }
 
     @Override

@@ -49,7 +49,7 @@ public final class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.
     @Override
     public void onBindViewHolder(ChatItemHolder holder, int position) {
         final ChatItem item = chatItems.get(position);
-        holder.bindChatId(item.getChatId());
+        holder.bindChatId(item);
 
         loader.load(item, holder.avatarView);
         holder.lastMessageView.setText(item.getLastMessage());
@@ -76,7 +76,7 @@ public final class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.
 
         final OnChatClickedListener listener;
 
-        int chatId;
+        ChatItem chat;
 
         public ChatItemHolder(View rootView, OnChatClickedListener listener) {
             super(rootView);
@@ -84,14 +84,14 @@ public final class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.
             rootView.setOnClickListener(this);
         }
 
-        public void bindChatId(int chatId) {
-            this.chatId = chatId;
+        public void bindChatId(ChatItem chat) {
+            this.chat = chat;
         }
 
 
         @Override
         public void onClick(View view) {
-            listener.onChatClicked(chatId);
+            listener.onChatClicked(chat);
         }
     }
 
@@ -126,6 +126,6 @@ public final class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.
     }
 
     public interface OnChatClickedListener {
-        void onChatClicked(int chatId);
+        void onChatClicked(ChatItem chat);
     }
 }

@@ -3,6 +3,11 @@
 
     <string name="chat.list.empty">There is no discussions.</string>
     <string name="chat.list.title">Discussion list</string>
+    
+    <plurals name="chat_participant">
+        <item quantity="one">%d participant</item>
+        <item quantity="other">%d participants</item>
+    </plurals>
 
     <!-- Dates -->
     <string name="today">Today</string>

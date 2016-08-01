@@ -1,6 +1,7 @@
 package com.github.programmerr47.vkdiscussionviewer.pager;
 
 import android.content.Context;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup.LayoutParams;
@@ -49,6 +50,8 @@ public abstract class Page extends UiControl {
     }
 
     private View wrapPageView(Context context, View pageView) {
+        pageView.setClickable(true);
+
         LayoutParams params = new LayoutParams(MATCH_PARENT, MATCH_PARENT);
         FrameLayout wrapperLayout = new FrameLayout(context);
         wrapperLayout.setLayoutParams(params);
