@@ -23,7 +23,7 @@ import java.util.concurrent.Future;
  * @since 2016-07-31
  */
 public class ChatListUpdater implements OnChatsReceivedListener {
-    private static final ExecutorService REQUEST_EXECUTOR = Executors.newSingleThreadExecutor();
+    private final ExecutorService requestExecutor = Executors.newSingleThreadExecutor();
 
     private final OnChatsPreparedListener listener;
     private Future currentTask;
@@ -37,7 +37,7 @@ public class ChatListUpdater implements OnChatsReceivedListener {
             currentTask.cancel(true);
         }
 
-        currentTask = REQUEST_EXECUTOR.submit(new RetrieveChatsTask(this));
+        currentTask = requestExecutor.submit(new RetrieveChatsTask(this));
     }
 
     @Override
