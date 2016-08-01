@@ -1,4 +1,11 @@
 <resources>
     <string name="app_name">Vk Discussion Viewer</string>
-    <string name="chat.list.empty">There is no discussions</string>
+
+    <string name="chat.list.empty">There is no discussions.</string>
+    <string name="chat.list.title">Discussion list</string>
+
+    <!-- Dates -->
+    <string name="today">Today</string>
+    <string name="yesterday">Yesterday</string>
+    <string name="tomorrow">Tomorrow</string>
 </resources>

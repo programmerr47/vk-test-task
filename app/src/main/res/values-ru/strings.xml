@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="chat.list.empty">Бесед нет.</string>
+    <string name="chat.list.title">Список бесед</string>
+
+    <!-- Dates -->
+    <string name="today">Сегодня</string>
+    <string name="yesterday">Вчера</string>
+    <string name="tomorrow">Завтра</string>
+</resources>

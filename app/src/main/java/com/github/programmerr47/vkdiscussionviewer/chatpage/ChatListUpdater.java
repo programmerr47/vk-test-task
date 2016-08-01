@@ -1,18 +1,19 @@
 package com.github.programmerr47.vkdiscussionviewer.chatpage;
 
+import android.util.SparseArray;
+
 import com.vk.sdk.api.VKApi;
 import com.vk.sdk.api.VKError;
 import com.vk.sdk.api.VKParameters;
 import com.vk.sdk.api.VKRequest;
 import com.vk.sdk.api.VKResponse;
-import com.vk.sdk.api.model.VKApiDialog;
-import com.vk.sdk.api.model.VKApiGetDialogResponse;
-import com.vk.sdk.api.model.VKApiMessage;
-import com.vk.sdk.api.model.VKList;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -21,75 +22,72 @@ import java.util.concurrent.Future;
  * @author Michael Spitsin
  * @since 2016-07-31
  */
-public class ChatListUpdater {
+public class ChatListUpdater implements OnChatsReceivedListener {
     private static final ExecutorService REQUEST_EXECUTOR = Executors.newSingleThreadExecutor();
 
+    private final OnChatsPreparedListener listener;
     private Future currentTask;
+
+    public ChatListUpdater(OnChatsPreparedListener listener) {
+        this.listener = listener;
+    }
 
     public void requestChats() {
         if (currentTask != null) {
             currentTask.cancel(true);
         }
 
-        currentTask = REQUEST_EXECUTOR.submit(new RetrieveChatsTask());
+        currentTask = REQUEST_EXECUTOR.submit(new RetrieveChatsTask(this));
     }
 
-    private static final class RetrieveChatsTask implements Runnable {
-        private static final int PART_COUNT = 3;
-        private static final int CHAT_MAX_COUNT = 17;
+    @Override
+    public void onChatsReceived(final List<ChatItem> chats, final SparseArray<ChatItem> chatMap) {
+        String idSequence = toIdSequence(chats);
+        VKApi.messages().getChatUsers(VKParameters.from("chat_ids", idSequence, "fields", "photo")).executeWithListener(new VKRequest.VKRequestListener() {
+            @Override
+            public void onComplete(VKResponse response) {
+                super.onComplete(response);
+                JSONObject responseObject = response.json.optJSONObject("response");
+                for (Iterator<String> it = responseObject.keys(); it.hasNext();){
+                    String key = it.next();
+                    JSONArray jsonArray = responseObject.optJSONArray(key);
+                    List<String> urls = new ArrayList<>();
+                    for (int arrayIndex = 0; arrayIndex < jsonArray.length(); arrayIndex++) {
+                        String photoUrl = jsonArray.optJSONObject(arrayIndex).optString("photo");
+                        urls.add(photoUrl);
 
-        private List<ChatItem> items = new ArrayList<>();
-
-        @Override
-        public void run() {
-            requestDialogsPart(0);
-            int t = 5;
-        }
-
-        private void requestDialogsPart(final int offset) {
-            VKApi.messages().getDialogs(VKParameters.from("offset", offset, "count", PART_COUNT)).executeSyncWithListener(new VKRequest.VKRequestListener() {
-                @Override
-                public void onComplete(VKResponse response) {
-                    super.onComplete(response);
-                    VKList<VKApiDialog> dialogs = ((VKApiGetDialogResponse) response.parsedModel).items;
-                    for (int i = 0; i < dialogs.size(); i++) {
-                        VKApiMessage message = dialogs.get(i).message;
-                        if (message.chat_id != 0) {
-                            items.add(toChatItem(message));
-
-                            if (items.size() >= CHAT_MAX_COUNT) {
-                                return;
-                            }
+                        if (urls.size() >= 4) {
+                            break;
                         }
                     }
-
-                    requestDialogsPart(offset + PART_COUNT);
-                    int t = 5;
+                    chatMap.get(Integer.parseInt(key)).setUrls(urls);
                 }
+                listener.onChatsReady(chats);
+            }
 
-                @Override
-                public void attemptFailed(VKRequest request, int attemptNumber, int totalAttempts) {
-                    super.attemptFailed(request, attemptNumber, totalAttempts);
-                }
+            @Override
+            public void attemptFailed(VKRequest request, int attemptNumber, int totalAttempts) {
+                super.attemptFailed(request, attemptNumber, totalAttempts);
+            }
 
-                @Override
-                public void onError(VKError error) {
-                    super.onError(error);
-                }
+            @Override
+            public void onError(VKError error) {
+                super.onError(error);
+            }
 
-                @Override
-                public void onProgress(VKRequest.VKProgressType progressType, long bytesLoaded, long bytesTotal) {
-                    super.onProgress(progressType, bytesLoaded, bytesTotal);
-                }
+            @Override
+            public void onProgress(VKRequest.VKProgressType progressType, long bytesLoaded, long bytesTotal) {
+                super.onProgress(progressType, bytesLoaded, bytesTotal);
+            }
+        });
+    }
 
-                private ChatItem toChatItem(VKApiMessage message) {
-                    return new ChatItem()
-                            .setChatId(message.chat_id)
-                            .setDate(message.date)
-                            .setLastMessage(message.body)
-                            .setTitle(message.title);
-                }
-            });
+    private String toIdSequence(List<ChatItem> chats) {
+        StringBuilder resultBuilder = new StringBuilder("" + chats.get(0).getChatId());
+        for (int i = 1; i < chats.size(); i++) {
+            resultBuilder.append(",").append(chats.get(i).getChatId());
         }
+
+        return resultBuilder.toString();
     }
 }

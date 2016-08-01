@@ -15,8 +15,7 @@
     <ImageView
         android:id="@+id/avatar"
         android:layout_width="56dp"
-        android:layout_height="56dp"
-        android:background="#ff0000"/>
+        android:layout_height="56dp"/>
 
     <com.github.programmerr47.vkdiscussionviewer.views.CustomFontTextView
         android:id="@+id/time"

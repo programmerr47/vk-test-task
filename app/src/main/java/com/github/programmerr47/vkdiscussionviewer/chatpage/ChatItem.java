@@ -1,12 +1,14 @@
 package com.github.programmerr47.vkdiscussionviewer.chatpage;
 
+import java.util.List;
+
 /**
  * @author Michael Spitsin
  * @since 2016-07-31
  */
 public class ChatItem {
     private int chatId;
-    private String[] urls;
+    private List<String> urls;
     private String title;
     private String lastMessage;
     private long date;
@@ -16,7 +18,7 @@ public class ChatItem {
         return this;
     }
 
-    ChatItem setUrls(String[] urls) {
+    ChatItem setUrls(List<String> urls) {
         this.urls = urls;
         return this;
     }
@@ -40,7 +42,7 @@ public class ChatItem {
         return chatId;
     }
 
-    public String[] getUrls() {
+    public List<String> getUrls() {
         return urls;
     }
 

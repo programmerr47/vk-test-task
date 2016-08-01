@@ -11,6 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:background="@color/colorPrimary"
+        app:theme="@style/AppTheme.AppBarOverlay"
         app:popupTheme="@style/AppTheme.PopupOverlay"/>
 
     <FrameLayout
@@ -34,6 +35,12 @@
             android:textColor="@color/text_secondary"
             android:visibility="gone"
             app:fontName="roboto_regular"/>
+
+        <ProgressBar
+            android:id="@+id/progress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"/>
 
         <View
             android:layout_width="match_parent"

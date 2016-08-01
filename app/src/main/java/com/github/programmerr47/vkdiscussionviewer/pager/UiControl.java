@@ -42,6 +42,11 @@ public abstract class UiControl {
         return view;
     }
 
+    @SuppressWarnings("unchecked")
+    protected <T> T bind(int id) {
+        return (T) view.findViewById(id);
+    }
+
     private void executeAllWorks() {
         if (uiWorks.size() > 0) {
             for (Runnable runnable : uiWorks) {
