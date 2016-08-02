@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Point;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
 import android.support.annotation.NonNull;
@@ -21,8 +22,13 @@ import static com.github.programmerr47.vkdiscussionviewer.VkApplication.appConte
 public class AndroidUtils {
 
     public static final Point screenSize = new Point();
+    public static final int AVATAR_DEFAULT_SIZE = (int) dp(56);
 
     private AndroidUtils() {}
+
+    public static boolean hasKitKat() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
+    }
 
     public static Typeface assetsTypeface(Constants.Font font) {
         return assetsTypeface(appContext(), font);

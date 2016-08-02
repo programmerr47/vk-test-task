@@ -4,6 +4,8 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.SparseArray;
 
+import com.github.programmerr47.vkdiscussionviewer.utils.AndroidUtils;
+import com.github.programmerr47.vkdiscussionviewer.utils.ApiUtils;
 import com.vk.sdk.api.VKApi;
 import com.vk.sdk.api.VKError;
 import com.vk.sdk.api.VKParameters;
@@ -12,13 +14,16 @@ import com.vk.sdk.api.VKResponse;
 import com.vk.sdk.api.model.VKApiDialog;
 import com.vk.sdk.api.model.VKApiGetDialogResponse;
 import com.vk.sdk.api.model.VKApiMessage;
+import com.vk.sdk.api.model.VKApiPhotoSize;
 import com.vk.sdk.api.model.VKList;
+import com.vk.sdk.api.model.VKPhotoSizes;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.github.programmerr47.vkdiscussionviewer.VkApplication.uiHandler;
+import static com.github.programmerr47.vkdiscussionviewer.utils.AndroidUtils.AVATAR_DEFAULT_SIZE;
 
 /**
  * @author Michael Spitsin
@@ -106,7 +111,18 @@ public class RetrieveChatsTask implements Runnable {
                         .setChatId(message.chat_id)
                         .setDate(message.date)
                         .setLastMessage(message.body)
-                        .setTitle(message.title);
+                        .setTitle(message.title)
+                        .setUrls(retrieveChatPhoto(message));
+            }
+
+            private List<String> retrieveChatPhoto(VKApiMessage message) {
+                List<String> urlContainer = new ArrayList<>();
+                String avatarUrl = ApiUtils.getAppropriatePhotoUrl(message.src);
+                if (avatarUrl != null) {
+                    urlContainer.add(avatarUrl);
+                }
+
+                return urlContainer;
             }
         });
     }

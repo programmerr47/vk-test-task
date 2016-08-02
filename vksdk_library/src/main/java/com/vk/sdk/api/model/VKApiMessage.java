@@ -29,6 +29,8 @@
 package com.vk.sdk.api.model;
 
 import android.os.Parcel;
+import android.text.TextUtils;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -75,6 +77,14 @@ public class VKApiMessage extends VKApiModel implements Identifiable, android.os
      */
     public String body;
 
+    public String photo50;
+
+    public String photo100;
+
+    public String photo200;
+
+    public VKPhotoSizes src = new VKPhotoSizes();
+
     /**
      * List of media-attachments;
      */
@@ -115,6 +125,22 @@ public class VKApiMessage extends VKApiModel implements Identifiable, android.os
         fwd_messages = new VKList<VKApiMessage>(source.optJSONArray("fwd_messages"), VKApiMessage.class);
         emoji = ParseUtils.parseBoolean(source, "emoji");
         deleted = ParseUtils.parseBoolean(source, "deleted");
+
+        photo50 = source.optString("photo_50");
+        photo100 = source.optString("photo_100");
+        photo200 = source.optString("photo_200");
+
+        if(!TextUtils.isEmpty(photo50)) {
+            src.add(VKApiPhotoSize.create(photo50, VKApiPhotoSize.S, 50, 50));
+        }
+        if(!TextUtils.isEmpty(photo100)) {
+            src.add(VKApiPhotoSize.create(photo100, VKApiPhotoSize.M, 100, 100));
+        }
+        if(!TextUtils.isEmpty(photo200)) {
+            src.add(VKApiPhotoSize.create(photo200, VKApiPhotoSize.X, 200, 200));
+        }
+        src.sort();
+
         return this;
     }
 

@@ -63,6 +63,8 @@ public class VKAccessToken {
      * Current user id for this token
      */
     public String userId = null;
+
+    public int userIdInt = 0;
     /**
      * User secret to sign requests (if nohttps used)
      */
@@ -193,6 +195,7 @@ public class VKAccessToken {
         try {
             token.accessToken = parameters.get(ACCESS_TOKEN);
             token.userId = parameters.get(USER_ID);
+            token.userIdInt = Integer.parseInt(token.userId);
             token.secret = parameters.get(SECRET);
             token.email = parameters.get(EMAIL);
             token.httpsRequired = false;

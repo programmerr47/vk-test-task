@@ -2,9 +2,6 @@ package com.github.programmerr47.vkdiscussionviewer.utils;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 
 import java.util.List;
@@ -17,46 +14,35 @@ import static com.github.programmerr47.vkdiscussionviewer.utils.AndroidUtils.dp;
  * @since 2016-08-01
  */
 public class BitmapUtils {
-
     private static final int avatarSize = (int) dp(56);
     private static final int avatarHalf = (int)(dp(56) / 2);
     private static final int margin = (int) dp(1);
 
     public static Bitmap transformsAvatars(List<Bitmap> avatars) {
-        if (!avatars.isEmpty()) {
-            switch (avatars.size()) {
-                case 1:
-                    return transform(avatars.get(0));
-                case 2:
-                    return transform(
-                            cropToHalf(avatars.get(0)), cropToHalf(avatars.get(1)));
-                case 3:
-                    return transform(
-                            cropToHalf(avatars.get(0)),
-                            avatars.get(1), avatars.get(2));
-                default:
-                    return transform(
-                            avatars.get(0), avatars.get(1),
-                            avatars.get(2), avatars.get(3));
-            }
-        } else {
-            return null;
-        }
+        Bitmap avatarSymbiont = mergeAvatars(avatars);
+        return CircleTransform.INSTANCE.transform(avatarSymbiont);
     }
 
-    private static Bitmap transform(Bitmap first) {
-        Rect firstSrcRect = new Rect(0, 0, first.getWidth(), first.getHeight());
-        Rect firstDstRect = new Rect(0, 0, avatarSize, avatarSize);
+    private static Bitmap mergeAvatars(List<Bitmap> avatars) {
+        if (avatars.isEmpty()) {
+            throw new IllegalArgumentException("Avatar list must be not empty");
+        }
 
-        Bitmap result = Bitmap.createBitmap(avatarSize, avatarSize, ARGB_8888);
-
-        Canvas canvas = new Canvas(result);
-        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        paint.setColor(0x00000000);
-        canvas.drawCircle(avatarHalf, avatarHalf, avatarHalf, paint);
-        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-        canvas.drawBitmap(first, firstSrcRect, firstDstRect, paint);
-        return result;
+        switch (avatars.size()) {
+            case 1:
+                return avatars.get(0);
+            case 2:
+                return transform(
+                        cropToHalf(avatars.get(0)), cropToHalf(avatars.get(1)));
+            case 3:
+                return transform(
+                        cropToHalf(avatars.get(0)),
+                        avatars.get(1), avatars.get(2));
+            default:
+                return transform(
+                        avatars.get(0), avatars.get(1),
+                        avatars.get(2), avatars.get(3));
+        }
     }
 
     private static Bitmap transform(Bitmap first, Bitmap second) {
@@ -68,11 +54,8 @@ public class BitmapUtils {
 
         Bitmap result = Bitmap.createBitmap(avatarSize, avatarSize, ARGB_8888);
         Canvas canvas = new Canvas(result);
-        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        canvas.drawCircle(avatarHalf, avatarHalf, avatarHalf, paint);
-        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-        canvas.drawBitmap(first, firstSrcRect, firstDstRect, paint);
-        canvas.drawBitmap(second, secondSrcRect, secondDstRect, paint);
+        canvas.drawBitmap(first, firstSrcRect, firstDstRect, null);
+        canvas.drawBitmap(second, secondSrcRect, secondDstRect, null);
         return result;
     }
 
@@ -88,12 +71,9 @@ public class BitmapUtils {
 
         Bitmap result = Bitmap.createBitmap(avatarSize, avatarSize, ARGB_8888);
         Canvas canvas = new Canvas(result);
-        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        canvas.drawCircle(avatarHalf, avatarHalf, avatarHalf, paint);
-        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-        canvas.drawBitmap(first, firstSrcRect, firstDstRect, paint);
-        canvas.drawBitmap(second, secondSrcRect, secondDstRect, paint);
-        canvas.drawBitmap(third, thirdSrcRect, thirdDstRect, paint);
+        canvas.drawBitmap(first, firstSrcRect, firstDstRect, null);
+        canvas.drawBitmap(second, secondSrcRect, secondDstRect, null);
+        canvas.drawBitmap(third, thirdSrcRect, thirdDstRect, null);
         return result;
     }
 
@@ -112,13 +92,10 @@ public class BitmapUtils {
 
         Bitmap result = Bitmap.createBitmap(avatarSize, avatarSize, ARGB_8888);
         Canvas canvas = new Canvas(result);
-        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        canvas.drawCircle(avatarHalf, avatarHalf, avatarHalf, paint);
-        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-        canvas.drawBitmap(first, firstSrcRect, firstDstRect, paint);
-        canvas.drawBitmap(second, secondSrcRect, secondDstRect, paint);
-        canvas.drawBitmap(third, thirdSrcRect, thirdDstRect, paint);
-        canvas.drawBitmap(fourth, fourthSrcRect, fourthDstRect, paint);
+        canvas.drawBitmap(first, firstSrcRect, firstDstRect, null);
+        canvas.drawBitmap(second, secondSrcRect, secondDstRect, null);
+        canvas.drawBitmap(third, thirdSrcRect, thirdDstRect, null);
+        canvas.drawBitmap(fourth, fourthSrcRect, fourthDstRect, null);
         return result;
     }
 

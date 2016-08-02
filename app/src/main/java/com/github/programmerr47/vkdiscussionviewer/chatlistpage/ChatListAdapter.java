@@ -1,7 +1,14 @@
 package com.github.programmerr47.vkdiscussionviewer.chatlistpage;
 
+import android.app.Application;
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.TransitionDrawable;
+import android.provider.ContactsContract;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +17,7 @@ import android.widget.TextView;
 
 import com.github.programmerr47.vkdiscussionviewer.R;
 import com.github.programmerr47.vkdiscussionviewer.VkApplication;
+import com.github.programmerr47.vkdiscussionviewer.imageLoading.AvatarLoader;
 import com.github.programmerr47.vkdiscussionviewer.utils.AdapterItemsUpdater;
 import com.github.programmerr47.vkdiscussionviewer.utils.BindViewHolder;
 import com.github.programmerr47.vkdiscussionviewer.utils.BitmapUtils;
@@ -17,11 +25,15 @@ import com.github.programmerr47.vkdiscussionviewer.utils.DateFormatter;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /**
  * @author Michael Spitsin
@@ -29,7 +41,8 @@ import java.util.concurrent.Executors;
  */
 
 public final class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatItemHolder> {
-    private final Loader loader = new Loader();
+
+    private final AvatarLoader loader = new AvatarLoader();
     private final AdapterItemsUpdater itemsUpdater = new AdapterItemsUpdater(this);
 
     private final OnChatClickedListener listener;
@@ -92,36 +105,6 @@ public final class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.
         @Override
         public void onClick(View view) {
             listener.onChatClicked(chat);
-        }
-    }
-
-    //TODO replace it with some caching mechanism and more smooth opening of bitmaps
-    private static final class Loader {
-        private final ExecutorService executorService = Executors.newSingleThreadExecutor();
-
-        public void load(final ChatItem item, final ImageView imageView) {
-            executorService.execute(new Runnable() {
-                @Override
-                public void run() {
-                    List<String> avatarUrls = item.getUrls();
-
-                    List<Bitmap> bitmaps = new ArrayList<>();
-                    for (String url : avatarUrls) {
-                        try {
-                            bitmaps.add(Picasso.with(null).load(url).get());
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    final Bitmap result = BitmapUtils.transformsAvatars(bitmaps);
-                    VkApplication.uiHandler().post(new Runnable() {
-                        @Override
-                        public void run() {
-                            imageView.setImageBitmap(result);
-                        }
-                    });
-                }
-            });
         }
     }
 

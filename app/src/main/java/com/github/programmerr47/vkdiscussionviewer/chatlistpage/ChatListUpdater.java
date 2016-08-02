@@ -2,13 +2,16 @@ package com.github.programmerr47.vkdiscussionviewer.chatlistpage;
 
 import android.util.SparseArray;
 
-import com.github.programmerr47.vkdiscussionviewer.VkApplication;
 import com.github.programmerr47.vkdiscussionviewer.model.User;
+import com.github.programmerr47.vkdiscussionviewer.utils.ApiUtils;
+import com.squareup.picasso.Picasso;
 import com.vk.sdk.api.VKApi;
 import com.vk.sdk.api.VKError;
 import com.vk.sdk.api.VKParameters;
 import com.vk.sdk.api.VKRequest;
 import com.vk.sdk.api.VKResponse;
+import com.vk.sdk.api.model.VKApiPhotoSize;
+import com.vk.sdk.api.model.VKPhotoSizes;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -21,6 +24,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import static com.github.programmerr47.vkdiscussionviewer.VkApplication.globalStorage;
+import static com.vk.sdk.VKAccessToken.currentToken;
 
 /**
  * @author Michael Spitsin
@@ -47,7 +51,7 @@ public class ChatListUpdater implements OnChatsReceivedListener {
     @Override
     public void onChatsReceived(final List<ChatItem> chats, final SparseArray<ChatItem> chatMap) {
         String idSequence = toIdSequence(chats);
-        VKApi.messages().getChatUsers(VKParameters.from("chat_ids", idSequence, "fields", "photo")).executeWithListener(new VKRequest.VKRequestListener() {
+        VKApi.messages().getChatUsers(VKParameters.from("chat_ids", idSequence, "fields", "photo,photo_50,photo_100,photo_200")).executeWithListener(new VKRequest.VKRequestListener() {
             @Override
             public void onComplete(VKResponse response) {
                 super.onComplete(response);
@@ -55,20 +59,28 @@ public class ChatListUpdater implements OnChatsReceivedListener {
                 for (Iterator<String> it = responseObject.keys(); it.hasNext();){
                     String key = it.next();
                     JSONArray jsonArray = responseObject.optJSONArray(key);
-                    List<String> urls = new ArrayList<>();
-                    for (int arrayIndex = 0; arrayIndex < jsonArray.length(); arrayIndex++) {
-                        String photoUrl = jsonArray.optJSONObject(arrayIndex).optString("photo");
-                        int id = jsonArray.optJSONObject(arrayIndex).optInt("id");
+                    ChatItem chat = chatMap.get(Integer.parseInt(key));
+                    chat.setParticipantsCount(jsonArray.length());
 
-                        globalStorage().cacheUser(new User().setId(id).setImageUrl(photoUrl));
-                        urls.add(photoUrl);
+                    if (chat.getUrls().isEmpty()) {
+                        List<String> urls = new ArrayList<>();
+                        for (int arrayIndex = 0; arrayIndex < jsonArray.length(); arrayIndex++) {
+                            JSONObject userJson = jsonArray.optJSONObject(arrayIndex);
+                            VKPhotoSizes userAvatarPhotoSizes = photoSizesFromJson(userJson);
+                            int id = userJson.optInt("id");
+                            String photoUrl = ApiUtils.getAppropriatePhotoUrl(userAvatarPhotoSizes);
 
-                        if (urls.size() >= 4) {
-                            break;
+                            globalStorage().cacheUser(new User().setId(id).setImageUrl(photoUrl));
+                            if (id != currentToken().userIdInt || jsonArray.length() == 1) {
+                                urls.add(photoUrl);
+                            }
+
+                            if (urls.size() >= 4) {
+                                break;
+                            }
                         }
+                        chat.setUrls(urls);
                     }
-                    chatMap.get(Integer.parseInt(key)).setUrls(urls);
-                    chatMap.get(Integer.parseInt(key)).setParticipantsCount(jsonArray.length());
                 }
                 listener.onChatsReady(chats);
             }
@@ -86,6 +98,27 @@ public class ChatListUpdater implements OnChatsReceivedListener {
             @Override
             public void onProgress(VKRequest.VKProgressType progressType, long bytesLoaded, long bytesTotal) {
                 super.onProgress(progressType, bytesLoaded, bytesTotal);
+            }
+
+            private VKPhotoSizes photoSizesFromJson(JSONObject response) {
+                VKPhotoSizes photoSizes = new VKPhotoSizes();
+                if (response.has("photo_50")) {
+                    photoSizes.add(VKApiPhotoSize.create(response.optString("photo_50"), VKApiPhotoSize.S, 50, 50));
+                }
+                if (response.has("photo_100")) {
+                    photoSizes.add(VKApiPhotoSize.create(response.optString("photo_100"), VKApiPhotoSize.M, 100, 100));
+                }
+                if (response.has("photo_200")) {
+                    photoSizes.add(VKApiPhotoSize.create(response.optString("photo_200"), VKApiPhotoSize.X, 200, 200));
+                }
+
+                if (photoSizes.isEmpty()) {
+                    photoSizes.add(VKApiPhotoSize.create(response.optString("photo"), VKApiPhotoSize.S, 50, 50));
+                } else {
+                    photoSizes.sort();
+                }
+
+                return photoSizes;
             }
         });
     }

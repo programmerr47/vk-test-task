@@ -21,7 +21,7 @@ public class AppActivity extends AppCompatActivity {
         setContentView(R.layout.activity_app);
         appFragment = (AppFragment) getFragmentManager().findFragmentById(R.id.app_fragment);
 
-        String[] str = VKUtil.getCertificateFingerprint(this, "com.github.programmerr47.vkdiscussionviewer");
+//        String[] str = VKUtil.getCertificateFingerprint(this, "com.github.programmerr47.vkdiscussionviewer");
 
         if (!VKSdk.isLoggedIn()) {
             VKSdk.login(this, VKScope.MESSAGES);
