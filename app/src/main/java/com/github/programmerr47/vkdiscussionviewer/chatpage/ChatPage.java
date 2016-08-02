@@ -82,13 +82,14 @@ public class ChatPage extends Page implements GetMessagesTask.OnMessagesReceived
         }
 
         isMessagesLoading = false;
-        if (messageList.isEmpty()) {
-            isHistoryFullyLoaded = true;
-        }
 
         hideView(progressBar);
         if (messageList.isEmpty()) {
-            showView(emptyMessagesLabel);
+            isHistoryFullyLoaded = true;
+
+            if (adapter.getItemCount() == 0) {
+                showView(emptyMessagesLabel);
+            }
         }
         adapter.addItems(messageList);
     }
