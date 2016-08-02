@@ -3,7 +3,10 @@ package com.github.programmerr47.vkdiscussionviewer;
 import android.app.Application;
 import android.content.Context;
 import android.os.Handler;
+import android.view.Display;
+import android.view.WindowManager;
 
+import com.github.programmerr47.vkdiscussionviewer.utils.AndroidUtils;
 import com.squareup.picasso.Picasso;
 import com.vk.sdk.VKSdk;
 
@@ -15,14 +18,17 @@ import com.vk.sdk.VKSdk;
 public class VkApplication extends Application {
     private static Context appContext;
     private static Handler uiHandler;
+    private static GlobalStorage globalStorage;
 
     @Override
     public void onCreate() {
         super.onCreate();
         appContext = getApplicationContext();
         uiHandler = new Handler();
+        globalStorage = new GlobalStorage();
         VKSdk.initialize(appContext);
         Picasso.setSingletonInstance(new Picasso.Builder(appContext).build());
+        checkScreenSize();
     }
 
     public static Context appContext() {
@@ -31,5 +37,17 @@ public class VkApplication extends Application {
 
     public static Handler uiHandler() {
         return uiHandler;
+    }
+
+    public static GlobalStorage globalStorage() {
+        return globalStorage;
+    }
+
+    private void checkScreenSize() {
+        WindowManager manager = (WindowManager) appContext.getSystemService(Context.WINDOW_SERVICE);
+        if (manager != null) {
+            Display display = manager.getDefaultDisplay();
+            display.getSize(AndroidUtils.screenSize);
+        }
     }
 }

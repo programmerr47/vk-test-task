@@ -2,6 +2,7 @@ package com.github.programmerr47.vkdiscussionviewer.utils;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.Point;
 import android.graphics.Typeface;
 import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
@@ -10,6 +11,7 @@ import android.util.TypedValue;
 import android.view.View;
 
 import static android.util.TypedValue.COMPLEX_UNIT_DIP;
+import static android.util.TypedValue.COMPLEX_UNIT_SP;
 import static com.github.programmerr47.vkdiscussionviewer.VkApplication.appContext;
 
 /**
@@ -17,6 +19,9 @@ import static com.github.programmerr47.vkdiscussionviewer.VkApplication.appConte
  * @since 2016-07-31
  */
 public class AndroidUtils {
+
+    public static final Point screenSize = new Point();
+
     private AndroidUtils() {}
 
     public static Typeface assetsTypeface(Constants.Font font) {
@@ -76,6 +81,15 @@ public class AndroidUtils {
     public static float dp(@NonNull Context context, float dp) {
         Resources res = context.getResources();
         return TypedValue.applyDimension(COMPLEX_UNIT_DIP, dp, res.getDisplayMetrics());
+    }
+
+    public static float sp(float sp) {
+        return sp(appContext(), sp);
+    }
+
+    public static float sp(@NonNull Context context, float sp) {
+        Resources res = context.getResources();
+        return TypedValue.applyDimension(COMPLEX_UNIT_SP, sp, res.getDisplayMetrics());
     }
 
     @SuppressWarnings("unchecked")

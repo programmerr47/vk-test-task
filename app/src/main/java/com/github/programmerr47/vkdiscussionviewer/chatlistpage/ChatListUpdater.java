@@ -2,6 +2,8 @@ package com.github.programmerr47.vkdiscussionviewer.chatlistpage;
 
 import android.util.SparseArray;
 
+import com.github.programmerr47.vkdiscussionviewer.VkApplication;
+import com.github.programmerr47.vkdiscussionviewer.model.User;
 import com.vk.sdk.api.VKApi;
 import com.vk.sdk.api.VKError;
 import com.vk.sdk.api.VKParameters;
@@ -17,6 +19,8 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+
+import static com.github.programmerr47.vkdiscussionviewer.VkApplication.globalStorage;
 
 /**
  * @author Michael Spitsin
@@ -54,6 +58,9 @@ public class ChatListUpdater implements OnChatsReceivedListener {
                     List<String> urls = new ArrayList<>();
                     for (int arrayIndex = 0; arrayIndex < jsonArray.length(); arrayIndex++) {
                         String photoUrl = jsonArray.optJSONObject(arrayIndex).optString("photo");
+                        int id = jsonArray.optJSONObject(arrayIndex).optInt("id");
+
+                        globalStorage().cacheUser(new User().setId(id).setImageUrl(photoUrl));
                         urls.add(photoUrl);
 
                         if (urls.size() >= 4) {

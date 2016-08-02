@@ -3,6 +3,7 @@
 
     <string name="chat.list.empty">There is no discussions.</string>
     <string name="chat.list.title">Discussion list</string>
+    <string name="message.list.empty">There is no messages.</string>
     
     <plurals name="chat_participant">
         <item quantity="one">%d participant</item>

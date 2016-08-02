@@ -91,6 +91,15 @@ public class VKApiMessages extends VKApiBase {
         });
     }
 
+    public VKRequest getChatHistory(VKParameters params) {
+        return prepareRequest("getHistory", params, new VKParser() {
+            @Override
+            public Object createModel(JSONObject object) {
+                return new VKApiGetMessagesResponse(object);
+            }
+        });
+    }
+
     @Override
     protected String getMethodsGroup() {
         return "messages";
