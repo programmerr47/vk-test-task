@@ -9,6 +9,7 @@ import android.text.style.AbsoluteSizeSpan;
 import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -21,6 +22,7 @@ import java.util.List;
 
 import static android.support.v7.widget.LinearLayoutManager.VERTICAL;
 import static android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE;
+import static com.github.programmerr47.vkdiscussionviewer.VkApplication.avatarLoader;
 import static com.github.programmerr47.vkdiscussionviewer.utils.AndroidUtils.color;
 import static com.github.programmerr47.vkdiscussionviewer.utils.AndroidUtils.plural;
 import static com.github.programmerr47.vkdiscussionviewer.utils.AnimationUtils.hideView;
@@ -41,6 +43,7 @@ public class ChatPage extends Page implements GetMessagesTask.OnMessagesReceived
     private LinearLayoutManager messagesLayoutManager;
     private ProgressBar progressBar;
     private TextView emptyMessagesLabel;
+    private ImageView avatarView;
 
     private boolean isMessagesLoading;
     private boolean isHistoryFullyLoaded;
@@ -70,9 +73,11 @@ public class ChatPage extends Page implements GetMessagesTask.OnMessagesReceived
         messagesView = bind(R.id.list);
         progressBar = bind(R.id.progress);
         emptyMessagesLabel = bind(R.id.empty_text);
+        avatarView = bind(R.id.avatar);
 
         prepareToolbar();
         prepareList();
+        avatarLoader().load(chatItem, avatarView);
     }
 
     @Override

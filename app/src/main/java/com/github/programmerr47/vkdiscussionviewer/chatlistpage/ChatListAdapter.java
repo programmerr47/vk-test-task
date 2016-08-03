@@ -35,14 +35,14 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import static com.github.programmerr47.vkdiscussionviewer.VkApplication.avatarLoader;
+
 /**
  * @author Michael Spitsin
  * @since 2016-07-31
  */
 
 public final class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatItemHolder> {
-
-    private final AvatarLoader loader = new AvatarLoader();
     private final AdapterItemsUpdater itemsUpdater = new AdapterItemsUpdater(this);
 
     private final OnChatClickedListener listener;
@@ -64,7 +64,7 @@ public final class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.
         final ChatItem item = chatItems.get(position);
         holder.bindChatId(item);
 
-        loader.load(item, holder.avatarView);
+        avatarLoader().load(item, holder.avatarView);
         holder.lastMessageView.setText(item.getLastMessage());
         holder.titleView.setText(item.getTitle());
         holder.timeView.setText(DateFormatter.formatDate(item.getDate()));

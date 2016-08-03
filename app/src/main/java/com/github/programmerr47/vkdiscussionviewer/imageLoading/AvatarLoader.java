@@ -11,6 +11,7 @@ import com.github.programmerr47.vkdiscussionviewer.utils.AndroidUtils;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.WeakHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -43,7 +44,7 @@ public final class AvatarLoader implements AvatarLoaderCacheHolder {
         }
     };
 
-    private Map<ImageView, Future> tasks = new HashMap<>();
+    private Map<ImageView, Future> tasks = new WeakHashMap<>();
 
     public void load(final ChatItem item, final ImageView imageView) {
         Future activeTask = tasks.remove(imageView);

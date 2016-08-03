@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.view.Display;
 import android.view.WindowManager;
 
+import com.github.programmerr47.vkdiscussionviewer.imageLoading.AvatarLoader;
 import com.github.programmerr47.vkdiscussionviewer.utils.AndroidUtils;
 import com.squareup.picasso.Picasso;
 import com.vk.sdk.VKSdk;
@@ -19,6 +20,7 @@ public class VkApplication extends Application {
     private static Context appContext;
     private static Handler uiHandler;
     private static GlobalStorage globalStorage;
+    private static AvatarLoader avatarLoader;
 
     @Override
     public void onCreate() {
@@ -26,6 +28,7 @@ public class VkApplication extends Application {
         appContext = getApplicationContext();
         uiHandler = new Handler();
         globalStorage = new GlobalStorage();
+        avatarLoader = new AvatarLoader();
         VKSdk.initialize(appContext);
         Picasso.setSingletonInstance(new Picasso.Builder(appContext).build());
         checkScreenSize();
@@ -41,6 +44,10 @@ public class VkApplication extends Application {
 
     public static GlobalStorage globalStorage() {
         return globalStorage;
+    }
+
+    public static AvatarLoader avatarLoader() {
+        return avatarLoader;
     }
 
     private void checkScreenSize() {
