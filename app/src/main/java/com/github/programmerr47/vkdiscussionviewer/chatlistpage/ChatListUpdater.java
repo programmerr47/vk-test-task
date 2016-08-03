@@ -62,23 +62,25 @@ public class ChatListUpdater implements OnChatsReceivedListener {
                     ChatItem chat = chatMap.get(Integer.parseInt(key));
                     chat.setParticipantsCount(jsonArray.length());
 
-                    if (chat.getUrls().isEmpty()) {
-                        List<String> urls = new ArrayList<>();
-                        for (int arrayIndex = 0; arrayIndex < jsonArray.length(); arrayIndex++) {
-                            JSONObject userJson = jsonArray.optJSONObject(arrayIndex);
-                            VKPhotoSizes userAvatarPhotoSizes = photoSizesFromJson(userJson);
-                            int id = userJson.optInt("id");
-                            String photoUrl = ApiUtils.getAppropriatePhotoUrl(userAvatarPhotoSizes);
+                    List<String> urls = new ArrayList<>();
+                    for (int arrayIndex = 0; arrayIndex < jsonArray.length(); arrayIndex++) {
+                        JSONObject userJson = jsonArray.optJSONObject(arrayIndex);
+                        VKPhotoSizes userAvatarPhotoSizes = photoSizesFromJson(userJson);
+                        int id = userJson.optInt("id");
+                        String photoUrl = ApiUtils.getAppropriatePhotoUrl(userAvatarPhotoSizes);
 
-                            globalStorage().cacheUser(new User().setId(id).setImageUrl(photoUrl));
-                            if (id != currentToken().userIdInt || jsonArray.length() == 1) {
-                                urls.add(photoUrl);
-                            }
+                        globalStorage().cacheUser(new User().setId(id).setImageUrl(photoUrl));
 
-                            if (urls.size() >= 4) {
-                                break;
-                            }
+                        if (id != currentToken().userIdInt || jsonArray.length() == 1) {
+                            urls.add(photoUrl);
                         }
+
+                        if (urls.size() >= 4) {
+                            break;
+                        }
+                    }
+
+                    if (chat.getUrls().isEmpty()) {
                         chat.setUrls(urls);
                     }
                 }

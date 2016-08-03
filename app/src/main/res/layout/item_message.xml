@@ -16,28 +16,12 @@
         android:layout_width="40dp"
         android:layout_height="40dp"/>
 
-    <TextView
-        android:id="@+id/time"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginLeft="8dp"
-        android:layout_marginStart="8dp"
-        android:paddingBottom="16dp"
-        android:text="20:32"
-        android:textSize="12sp"
-        android:textColor="@color/text_secondary_dark"/>
-
     <LinearLayout
         android:id="@+id/message_content"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@id/avatar"
         android:layout_toEndOf="@id/avatar"
-        android:layout_toLeftOf="@id/time"
-        android:layout_toStartOf="@id/time"
         android:orientation="vertical"
         android:background="@drawable/inbox_message_bg">
 
@@ -53,11 +37,26 @@
             android:textSize="16sp"
             android:textColor="@color/text_primary"/>
 
-        <ImageView
+        <com.github.programmerr47.vkdiscussionviewer.views.PhotoAttachmentView
             android:id="@+id/attachment_photo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/message_content"
+        android:layout_toEndOf="@id/message_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
+        android:paddingBottom="16dp"
+        android:text="20:32"
+        android:textSize="12sp"
+        android:textColor="@color/text_secondary_dark"/>
 
 </RelativeLayout>

@@ -12,11 +12,13 @@ import com.github.programmerr47.vkdiscussionviewer.R;
 import com.github.programmerr47.vkdiscussionviewer.VkApplication;
 import com.github.programmerr47.vkdiscussionviewer.chatlistpage.ChatItem;
 import com.github.programmerr47.vkdiscussionviewer.chatlistpage.ChatListAdapter;
+import com.github.programmerr47.vkdiscussionviewer.model.VkPhotoSet;
 import com.github.programmerr47.vkdiscussionviewer.utils.AdapterItemsUpdater;
 import com.github.programmerr47.vkdiscussionviewer.utils.BindViewHolder;
 import com.github.programmerr47.vkdiscussionviewer.utils.BitmapUtils;
 import com.github.programmerr47.vkdiscussionviewer.utils.CircleTransform;
 import com.github.programmerr47.vkdiscussionviewer.utils.DateFormatter;
+import com.github.programmerr47.vkdiscussionviewer.views.PhotoAttachmentView;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -47,15 +49,15 @@ public class MessageListAdapter extends RecyclerView.Adapter {
             MessageItemHolder holder = (MessageItemHolder) viewHolder;
 
             Message item = messageItems.get(position);
-            List<String> imageUrls = item.getImageUrls();
+            VkPhotoSet photoSet = item.getPhotoSet();
 
-            if (imageUrls.isEmpty()) {
+            if (photoSet.isEmpty()) {
                 holder.attachmentPhoto.setVisibility(View.GONE);
             } else {
                 holder.attachmentPhoto.setVisibility(View.VISIBLE);
-                Picasso.with(null).load(imageUrls.get(0)).into(holder.attachmentPhoto);
             }
 
+            holder.attachmentPhoto.setPhotoSet(photoSet);
             Picasso.with(null).load(item.getAvatarUrl()).transform(CircleTransform.INSTANCE).into(holder.avatarView);
 
             holder.textView.setText(item.getContent());
@@ -92,7 +94,7 @@ public class MessageListAdapter extends RecyclerView.Adapter {
     public static final class MessageItemHolder extends BindViewHolder {
         final ImageView avatarView = bind(R.id.avatar);
         final TextView textView = bind(R.id.text);
-        final ImageView attachmentPhoto = bind(R.id.attachment_photo);
+        final PhotoAttachmentView attachmentPhoto = bind(R.id.attachment_photo);
         final TextView timeView = bind(R.id.time);
 
         public MessageItemHolder(View rootView) {

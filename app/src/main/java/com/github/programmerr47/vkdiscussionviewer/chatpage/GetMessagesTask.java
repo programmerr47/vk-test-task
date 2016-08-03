@@ -3,6 +3,8 @@ package com.github.programmerr47.vkdiscussionviewer.chatpage;
 import android.app.Application;
 
 import com.github.programmerr47.vkdiscussionviewer.VkApplication;
+import com.github.programmerr47.vkdiscussionviewer.model.VkPhotoSet;
+import com.github.programmerr47.vkdiscussionviewer.utils.PhotoSetCreator;
 import com.vk.sdk.api.VKApi;
 import com.vk.sdk.api.VKError;
 import com.vk.sdk.api.VKParameters;
@@ -58,13 +60,18 @@ public class GetMessagesTask {
                                 super.onComplete(response);
                                 VKApiGetMessagesResponse messagesResponse = (VKApiGetMessagesResponse) response.parsedModel;
                                 List<Message> messages = new ArrayList<>();
-                                for (VKApiMessage apiMessage : messagesResponse.items) {
-                                    messages.add(new Message()
-                                            .setId(apiMessage.id)
-                                            .setAvatarUrl(globalStorage().getUser(apiMessage.user_id).getImageUrl())
-                                            .setDate(apiMessage.date)
-                                            .setContent(apiMessage.body)
-                                            .setImageUrls(getImages(apiMessage)));
+                                try {
+                                    for (VKApiMessage apiMessage : messagesResponse.items) {
+                                        messages.add(new Message()
+                                                .setId(apiMessage.id)
+                                                .setAvatarUrl(globalStorage().getUser(apiMessage.user_id).getImageUrl())
+                                                .setDate(apiMessage.date)
+                                                .setContent(apiMessage.body)
+                                                .setPhotoSet(PhotoSetCreator.createPhotoSet(apiMessage.attachments)));
+                                    }
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                    int t = 5;
                                 }
                                 GetMessagesTask.this.notify(offset, messages);
                             }
@@ -72,29 +79,17 @@ public class GetMessagesTask {
                             @Override
                             public void attemptFailed(VKRequest request, int attemptNumber, int totalAttempts) {
                                 super.attemptFailed(request, attemptNumber, totalAttempts);
-                                GetMessagesTask.this.notify(offset, Collections.<Message>emptyList());
                             }
 
                             @Override
                             public void onError(VKError error) {
                                 super.onError(error);
+                                GetMessagesTask.this.notify(offset, Collections.<Message>emptyList());
                             }
 
                             @Override
                             public void onProgress(VKRequest.VKProgressType progressType, long bytesLoaded, long bytesTotal) {
                                 super.onProgress(progressType, bytesLoaded, bytesTotal);
-                            }
-
-                            private List<String> getImages(VKApiMessage apiMessage) {
-                                List<String> strings = new ArrayList<String>();
-                                for (VKAttachments.VKApiAttachment apiAttachment : apiMessage.attachments) {
-                                    if (TYPE_PHOTO.equals(apiAttachment.getType())) {
-                                        VKApiPhoto photo = (VKApiPhoto) apiAttachment;
-                                        strings.add(photo.photo_604);
-                                    }
-                                }
-
-                                return strings;
                             }
                         });
             }

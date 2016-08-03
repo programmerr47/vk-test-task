@@ -1,6 +1,6 @@
 package com.github.programmerr47.vkdiscussionviewer.chatpage;
 
-import java.util.List;
+import com.github.programmerr47.vkdiscussionviewer.model.VkPhotoSet;
 
 /**
  * @author Michael Spitsin
@@ -11,7 +11,7 @@ public class Message {
     private String avatarUrl;
     private long date;
     private String content;
-    private List<String> imageUrls;
+    private VkPhotoSet photoSet;
 
     Message setId(int id) {
         this.id = id;
@@ -33,8 +33,8 @@ public class Message {
         return this;
     }
 
-    Message setImageUrls(List<String> imageUrls) {
-        this.imageUrls = imageUrls;
+    Message setPhotoSet(VkPhotoSet photoSet) {
+        this.photoSet = photoSet;
         return this;
     }
 
@@ -54,7 +54,7 @@ public class Message {
         return content;
     }
 
-    public List<String> getImageUrls() {
-        return imageUrls;
+    public VkPhotoSet getPhotoSet() {
+        return photoSet;
     }
 }
