@@ -18,6 +18,9 @@ import com.github.programmerr47.vkdiscussionviewer.model.VkPhotoSet;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * @author Michael Spitsin
  * @since 2016-08-03
@@ -27,6 +30,7 @@ public class PhotoAttachmentView extends View {
 
     private VkPhotoSet photoSet = new VkPhotoSet();
     private Drawable[] photoSetDrawables = new Drawable[0];
+    private BitmapTarget[] targets = new BitmapTarget[0];
 
     public PhotoAttachmentView(Context context) {
         super(context);
@@ -62,9 +66,14 @@ public class PhotoAttachmentView extends View {
     }
 
     public void setPhotoSet(VkPhotoSet photoSet) {
+        for (int i = 0; i < targets.length; i++) {
+            targets[i].clear();
+        }
+
         VkPhotoSet oldPhotoSet = this.photoSet;
         this.photoSet = photoSet;
-        photoSetDrawables = load(photoSet);
+
+        load(photoSet);
 
         if (oldPhotoSet.width() != photoSet.width() || oldPhotoSet.height() != photoSet.height()) {
             requestLayout();
@@ -73,19 +82,29 @@ public class PhotoAttachmentView extends View {
         invalidate();
     }
 
-    private Drawable[] load(VkPhotoSet photoSet) {
-        Drawable[] placeholders = new Drawable[photoSet.size()];
+    @Override
+    protected boolean verifyDrawable(Drawable drawable) {
+        for (int i = 0; i < photoSetDrawables.length; i++) {
+            if (photoSetDrawables[i] == drawable) {
+                return true;
+            }
+        }
+
+        return super.verifyDrawable(drawable);
+    }
+
+    private void load(VkPhotoSet photoSet) {
+        photoSetDrawables = new Drawable[photoSet.size()];
+        targets = new BitmapTarget[photoSet.size()];
         for (int i = 0; i < photoSet.size(); i++) {
             Drawable placeholderDrawable = new ColorDrawable(0xffaaaaaa);
             placeholderDrawable.setBounds(photoSet.photoRect(i));
+            photoSetDrawables[i] = placeholderDrawable;
 
             Log.v("FUCK", "Load for " + i + " image is started");
-            Picasso.with(null).load(photoSet.getPhoto(i).getUrl()).into(new BitmapTarget(i, this));
-
-            placeholders[i] = placeholderDrawable;
+            targets[i] = new BitmapTarget(i, this);
+            Picasso.with(null).load(photoSet.getPhoto(i).getUrl()).into(targets[i]);
         }
-
-        return placeholders;
     }
 
     private void setDrawable(int id, Drawable drawable) {
@@ -99,7 +118,7 @@ public class PhotoAttachmentView extends View {
 
     private static final class BitmapTarget implements Target {
         private final int id;
-        private final PhotoAttachmentView targetView;
+        private PhotoAttachmentView targetView;
 
         public BitmapTarget(int id, PhotoAttachmentView targetView) {
             this.id = id;
@@ -109,23 +128,28 @@ public class PhotoAttachmentView extends View {
         @Override
         public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
             Log.v("FUCK", "Id: " + id + " onBitmapLoaded");
-            final Drawable resultDrawable;
+            if (targetView != null) {
+                final Drawable resultDrawable;
 
-            resultDrawable = new BitmapDrawable(targetView.getResources(), bitmap);
-//            if (from == Picasso.LoadedFrom.MEMORY) {
-//            } else {
-//                resultDrawable = new TransitionDrawable(new Drawable[]{
-//                        targetView.getDrawable(id),
-//                        new BitmapDrawable(targetView.getResources(), bitmap)});
-//            }
+                if (from == Picasso.LoadedFrom.MEMORY) {
+                    resultDrawable = new BitmapDrawable(targetView.getResources(), bitmap);
+                } else {
+                    resultDrawable = new TransitionDrawable(new Drawable[]{
+                            targetView.getDrawable(id),
+                            new BitmapDrawable(targetView.getResources(), bitmap)});
+                }
+                resultDrawable.setCallback(targetView);
 
-            changeDrawable(resultDrawable);
+                changeDrawable(resultDrawable);
+            }
         }
 
         @Override
         public void onBitmapFailed(Drawable errorDrawable) {
             Log.v("FUCK", "Id: " + id + " onBitmapFailed");
-            changeDrawable(errorDrawable);
+            if (targetView != null) {
+                changeDrawable(errorDrawable);
+            }
         }
 
         @Override
@@ -133,14 +157,20 @@ public class PhotoAttachmentView extends View {
             Log.v("FUCK", "Id: " + id + " onPrepareLoad");
         }
 
+        public void clear() {
+            Log.v("FUCK", "Bitmap target with id " + id + " cleared");
+            targetView = null;
+        }
+
         private void changeDrawable(Drawable drawable) {
             Rect bounds = targetView.getDrawable(id).getBounds();
             drawable.setBounds(bounds);
-            targetView.setDrawable(id, drawable);
 
             if (drawable instanceof TransitionDrawable) {
                 ((TransitionDrawable) drawable).startTransition(FADE_TRANSITION_DURATION);
             }
+
+            targetView.setDrawable(id, drawable);
         }
     }
 }

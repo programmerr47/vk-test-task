@@ -2,6 +2,7 @@ package com.github.programmerr47.vkdiscussionviewer.chatpage;
 
 import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +25,10 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import static android.text.TextUtils.isEmpty;
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
 
 /**
  * @author Michael Spitsin
@@ -52,15 +57,21 @@ public class MessageListAdapter extends RecyclerView.Adapter {
             VkPhotoSet photoSet = item.getPhotoSet();
 
             if (photoSet.isEmpty()) {
-                holder.attachmentPhoto.setVisibility(View.GONE);
+                holder.attachmentPhoto.setVisibility(GONE);
             } else {
-                holder.attachmentPhoto.setVisibility(View.VISIBLE);
+                holder.attachmentPhoto.setVisibility(VISIBLE);
             }
 
             holder.attachmentPhoto.setPhotoSet(photoSet);
             Picasso.with(null).load(item.getAvatarUrl()).transform(CircleTransform.INSTANCE).into(holder.avatarView);
 
-            holder.textView.setText(item.getContent());
+            if (isEmpty(item.getContent())) {
+                holder.textView.setVisibility(GONE);
+            } else {
+                holder.textView.setText(item.getContent());
+                holder.textView.setVisibility(VISIBLE);
+            }
+
             holder.timeView.setText(DateFormatter.formatDate(item.getDate()));
         }
     }

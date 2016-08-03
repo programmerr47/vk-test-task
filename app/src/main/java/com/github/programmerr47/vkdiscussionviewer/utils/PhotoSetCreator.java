@@ -19,8 +19,8 @@ import static com.vk.sdk.api.model.VKAttachments.TYPE_PHOTO;
  * @since 2016-08-03
  */
 public class PhotoSetCreator {
-    private static final int PHOTOSET_W_MAX = (int) dp(248);
-    private static final int PHOTOSET_H_MAX = (int) dp(448);
+    private static final int PHOTOSET_W_MAX = (int) dp(198);
+    private static final int PHOTOSET_H_MAX = (int) dp(298);
 
     private static final int margin = (int) dp(1);
 
@@ -34,19 +34,24 @@ public class PhotoSetCreator {
 
         VkPhotoSet photoSet = new VkPhotoSet();
 
-        if (photos.size() == 1) {
+        if (photos.size() >= 1) {
             VKApiPhoto apiPhoto = photos.get(0);
             VkPhoto photo = new VkPhoto()
                     .setId(apiPhoto.getId())
                     .setUrl(apiPhoto.photo_604);
 
             if (apiPhoto.width > PHOTOSET_W_MAX || apiPhoto.height > PHOTOSET_H_MAX) {
-                final float newHeight;
-                final float newWidth;
+                float newHeight;
+                float newWidth;
 
                 if (apiPhoto.width > PHOTOSET_W_MAX) {
                     newHeight = 1f * apiPhoto.height * PHOTOSET_W_MAX / apiPhoto.width;
                     newWidth = PHOTOSET_W_MAX;
+
+                    if (newHeight > PHOTOSET_H_MAX) {
+                        newWidth = 1f * newWidth * PHOTOSET_H_MAX / newHeight;
+                        newHeight = PHOTOSET_H_MAX;
+                    }
                 } else {
                     newWidth = 1f * apiPhoto.width * PHOTOSET_H_MAX / apiPhoto.height;
                     newHeight = PHOTOSET_H_MAX;
