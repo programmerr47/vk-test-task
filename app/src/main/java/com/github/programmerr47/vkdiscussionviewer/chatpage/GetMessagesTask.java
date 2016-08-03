@@ -1,9 +1,5 @@
 package com.github.programmerr47.vkdiscussionviewer.chatpage;
 
-import android.app.Application;
-
-import com.github.programmerr47.vkdiscussionviewer.VkApplication;
-import com.github.programmerr47.vkdiscussionviewer.model.VkPhotoSet;
 import com.github.programmerr47.vkdiscussionviewer.utils.PhotoSetCreator;
 import com.vk.sdk.api.VKApi;
 import com.vk.sdk.api.VKError;
@@ -12,8 +8,6 @@ import com.vk.sdk.api.VKRequest;
 import com.vk.sdk.api.VKResponse;
 import com.vk.sdk.api.model.VKApiGetMessagesResponse;
 import com.vk.sdk.api.model.VKApiMessage;
-import com.vk.sdk.api.model.VKApiPhoto;
-import com.vk.sdk.api.model.VKAttachments;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -26,7 +20,6 @@ import java.util.concurrent.Future;
 import static com.github.programmerr47.vkdiscussionviewer.VkApplication.globalStorage;
 import static com.github.programmerr47.vkdiscussionviewer.VkApplication.uiHandler;
 import static com.github.programmerr47.vkdiscussionviewer.utils.ApiUtils.getMessageContent;
-import static com.vk.sdk.api.model.VKAttachments.TYPE_PHOTO;
 
 /**
  * @author Michael Spitsin
@@ -60,11 +53,12 @@ public class GetMessagesTask {
                             public void onComplete(VKResponse response) {
                                 super.onComplete(response);
                                 VKApiGetMessagesResponse messagesResponse = (VKApiGetMessagesResponse) response.parsedModel;
-                                List<Message> messages = new ArrayList<>();
+                                List<ChatItem> chatItems = new ArrayList<>();
                                 try {
                                     for (VKApiMessage apiMessage : messagesResponse.items) {
-                                        messages.add(new Message()
+                                        chatItems.add(new MessageItem()
                                                 .setId(apiMessage.id)
+                                                .setUserId(apiMessage.user_id)
                                                 .setAvatarUrl(globalStorage().getUser(apiMessage.user_id).getImageUrl())
                                                 .setDate(apiMessage.date)
                                                 .setContent(getMessageContent(apiMessage))
@@ -74,7 +68,7 @@ public class GetMessagesTask {
                                     e.printStackTrace();
                                     int t = 5;
                                 }
-                                GetMessagesTask.this.notify(offset, messages);
+                                GetMessagesTask.this.notify(offset, chatItems);
                             }
 
                             @Override
@@ -85,7 +79,7 @@ public class GetMessagesTask {
                             @Override
                             public void onError(VKError error) {
                                 super.onError(error);
-                                GetMessagesTask.this.notify(offset, Collections.<Message>emptyList());
+                                GetMessagesTask.this.notify(offset, Collections.<ChatItem>emptyList());
                             }
 
                             @Override
@@ -97,19 +91,19 @@ public class GetMessagesTask {
         });
     }
 
-    private void notify(final int offset, final List<Message> messageList) {
+    private void notify(final int offset, final List<ChatItem> chatItems) {
         uiHandler().post(new Runnable() {
             @Override
             public void run() {
                 OnMessagesReceivedListener listener = weakListener.get();
                 if (listener != null) {
-                    listener.onMessagesReceived(offset, messageList);
+                    listener.onMessagesReceived(offset, chatItems);
                 }
             }
         });
     }
 
     public interface OnMessagesReceivedListener {
-        void onMessagesReceived(int offset, List<Message> messageList);
+        void onMessagesReceived(int offset, List<ChatItem> chatItems);
     }
 }

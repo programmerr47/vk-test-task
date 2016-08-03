@@ -6,7 +6,7 @@ import java.util.List;
  * @author Michael Spitsin
  * @since 2016-07-31
  */
-public class ChatItem {
+public class Chat {
     private int chatId;
     private String title;
     private String lastMessage;
@@ -14,32 +14,32 @@ public class ChatItem {
     private List<String> urls;
     private int participantsCount;
 
-    ChatItem setChatId(int chatId) {
+    Chat setChatId(int chatId) {
         this.chatId = chatId;
         return this;
     }
 
-    ChatItem setTitle(String title) {
+    Chat setTitle(String title) {
         this.title = title;
         return this;
     }
 
-    ChatItem setLastMessage(String lastMessage) {
+    Chat setLastMessage(String lastMessage) {
         this.lastMessage = lastMessage;
         return this;
     }
 
-    ChatItem setDate(long date) {
+    Chat setDate(long date) {
         this.date = date;
         return this;
     }
 
-    ChatItem setUrls(List<String> urls) {
+    Chat setUrls(List<String> urls) {
         this.urls = urls;
         return this;
     }
 
-    ChatItem setParticipantsCount(int count) {
+    Chat setParticipantsCount(int count) {
         this.participantsCount = count;
         return this;
     }

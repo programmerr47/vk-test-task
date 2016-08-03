@@ -10,7 +10,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.github.programmerr47.vkdiscussionviewer.R;
 import com.github.programmerr47.vkdiscussionviewer.chatlistpage.ChatListAdapter.OnChatClickedListener;
@@ -37,7 +36,7 @@ public final class ChatListPage extends Page implements OnChatsPreparedListener,
 
     private final ChatListUpdater updater = new ChatListUpdater(this);
     private ChatListAdapter adapter = new ChatListAdapter(this);
-    private List<ChatItem> chats = new ArrayList<>();
+    private List<Chat> chats = new ArrayList<>();
     private boolean isChatsLoaded;
 
     private Toolbar toolbar;
@@ -75,7 +74,7 @@ public final class ChatListPage extends Page implements OnChatsPreparedListener,
     }
 
     @Override
-    public void onChatsReady(List<ChatItem> chats) {
+    public void onChatsReady(List<Chat> chats) {
         isChatsLoaded = true;
         this.chats = chats;
         adapter.updateItems(chats);
@@ -87,8 +86,8 @@ public final class ChatListPage extends Page implements OnChatsPreparedListener,
     }
 
     @Override
-    public void onChatClicked(ChatItem chatItem) {
-        pagerListener.openPage(new ChatPage(chatItem));
+    public void onChatClicked(Chat chat) {
+        pagerListener.openPage(new ChatPage(chat));
     }
 
     private void prepareToolbar() {

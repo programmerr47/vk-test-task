@@ -34,8 +34,8 @@ public class RetrieveChatsTask implements Runnable {
     private final WeakReference<OnChatsReceivedListener> weakListener;
 
     private Handler handler;
-    private List<ChatItem> items = new ArrayList<>();
-    private SparseArray<ChatItem> itemMap = new SparseArray<>();
+    private List<Chat> items = new ArrayList<>();
+    private SparseArray<Chat> itemMap = new SparseArray<>();
 
     public RetrieveChatsTask(OnChatsReceivedListener listener) {
         weakListener = new WeakReference<>(listener);
@@ -65,9 +65,9 @@ public class RetrieveChatsTask implements Runnable {
                         for (int i = 0; i < dialogs.size(); i++) {
                             VKApiMessage message = dialogs.get(i).message;
                             if (message.chat_id != 0) {
-                                ChatItem chatItem = toChatItem(message);
-                                items.add(chatItem);
-                                itemMap.append(chatItem.getChatId(), chatItem);
+                                Chat chat = toChatItem(message);
+                                items.add(chat);
+                                itemMap.append(chat.getChatId(), chat);
 
                                 if (items.size() >= CHAT_MAX_COUNT) {
                                     postResult();
@@ -107,8 +107,8 @@ public class RetrieveChatsTask implements Runnable {
                 super.onProgress(progressType, bytesLoaded, bytesTotal);
             }
 
-            private ChatItem toChatItem(VKApiMessage message) {
-                return new ChatItem()
+            private Chat toChatItem(VKApiMessage message) {
+                return new Chat()
                         .setChatId(message.chat_id)
                         .setDate(message.date)
                         .setLastMessage(getMessageContent(message))

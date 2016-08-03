@@ -5,10 +5,9 @@ import android.graphics.drawable.ColorDrawable;
 import android.support.v4.util.LruCache;
 import android.widget.ImageView;
 
-import com.github.programmerr47.vkdiscussionviewer.chatlistpage.ChatItem;
+import com.github.programmerr47.vkdiscussionviewer.chatlistpage.Chat;
 import com.github.programmerr47.vkdiscussionviewer.utils.AndroidUtils;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -46,7 +45,7 @@ public final class AvatarLoader implements AvatarLoaderCacheHolder {
 
     private Map<ImageView, Future> tasks = new WeakHashMap<>();
 
-    public void load(final ChatItem item, final ImageView imageView) {
+    public void load(final Chat item, final ImageView imageView) {
         Future activeTask = tasks.remove(imageView);
         if (activeTask != null) {
             activeTask.cancel(true);

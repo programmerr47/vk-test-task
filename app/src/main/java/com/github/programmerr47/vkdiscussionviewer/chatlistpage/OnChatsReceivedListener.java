@@ -9,5 +9,5 @@ import java.util.List;
  * @since 2016-08-01
  */
 public interface OnChatsReceivedListener {
-    void onChatsReceived(List<ChatItem> chats, SparseArray<ChatItem> chatMap);
+    void onChatsReceived(List<Chat> chats, SparseArray<Chat> chatMap);
 }

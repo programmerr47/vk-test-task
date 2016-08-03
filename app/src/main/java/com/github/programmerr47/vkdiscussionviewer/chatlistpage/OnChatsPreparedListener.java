@@ -7,5 +7,5 @@ import java.util.List;
  * @since 2016-08-01
  */
 public interface OnChatsPreparedListener {
-    void onChatsReady(List<ChatItem> chats);
+    void onChatsReady(List<Chat> chats);
 }

@@ -7,7 +7,7 @@ import android.graphics.drawable.TransitionDrawable;
 import android.widget.ImageView;
 
 import com.github.programmerr47.vkdiscussionviewer.VkApplication;
-import com.github.programmerr47.vkdiscussionviewer.chatlistpage.ChatItem;
+import com.github.programmerr47.vkdiscussionviewer.chatlistpage.Chat;
 import com.github.programmerr47.vkdiscussionviewer.utils.BitmapUtils;
 import com.squareup.picasso.Picasso;
 
@@ -25,10 +25,10 @@ import static com.github.programmerr47.vkdiscussionviewer.imageLoading.AvatarLoa
  */
 public class AvatarLoadAction implements Runnable {
     private final WeakReference<ImageView> weakImageView;
-    private final ChatItem data;
+    private final Chat data;
     private final AvatarLoaderCacheHolder cacheHolder;
 
-    public AvatarLoadAction(ChatItem data, ImageView imageView, AvatarLoaderCacheHolder cacheHolder) {
+    public AvatarLoadAction(Chat data, ImageView imageView, AvatarLoaderCacheHolder cacheHolder) {
         weakImageView = new WeakReference<>(imageView);
         this.data = data;
         this.cacheHolder = cacheHolder;

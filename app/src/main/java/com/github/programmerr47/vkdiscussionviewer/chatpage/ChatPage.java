@@ -14,7 +14,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.github.programmerr47.vkdiscussionviewer.R;
-import com.github.programmerr47.vkdiscussionviewer.chatlistpage.ChatItem;
+import com.github.programmerr47.vkdiscussionviewer.chatlistpage.Chat;
+import com.github.programmerr47.vkdiscussionviewer.chatpage.ChatItem;
 import com.github.programmerr47.vkdiscussionviewer.pager.Page;
 import com.github.programmerr47.vkdiscussionviewer.utils.CustomTypefaceSpan;
 
@@ -36,7 +37,7 @@ import static com.github.programmerr47.vkdiscussionviewer.utils.Constants.Font.R
  */
 public class ChatPage extends Page implements GetMessagesTask.OnMessagesReceivedListener {
     private final MessageListAdapter adapter = new MessageListAdapter();
-    private final ChatItem chatItem;
+    private final Chat chat;
     private final GetMessagesTask messagesTask;
 
     private RecyclerView messagesView;
@@ -48,9 +49,9 @@ public class ChatPage extends Page implements GetMessagesTask.OnMessagesReceived
     private boolean isMessagesLoading;
     private boolean isHistoryFullyLoaded;
 
-    public ChatPage(ChatItem chatItem) {
-        this.chatItem = chatItem;
-        messagesTask = new GetMessagesTask(chatItem.getChatId(), this);
+    public ChatPage(Chat chat) {
+        this.chat = chat;
+        messagesTask = new GetMessagesTask(chat.getChatId(), this);
         uiWorks.add(new Runnable() {
             @Override
             public void run() {
@@ -77,11 +78,11 @@ public class ChatPage extends Page implements GetMessagesTask.OnMessagesReceived
 
         prepareToolbar();
         prepareList();
-        avatarLoader().load(chatItem, avatarView);
+        avatarLoader().load(chat, avatarView);
     }
 
     @Override
-    public void onMessagesReceived(int offset, List<Message> messageList) {
+    public void onMessagesReceived(int offset, List<ChatItem> chatItems) {
         if (offset > 0) {
             adapter.hideLoading();
         }
@@ -89,26 +90,26 @@ public class ChatPage extends Page implements GetMessagesTask.OnMessagesReceived
         isMessagesLoading = false;
 
         hideView(progressBar);
-        if (messageList.isEmpty()) {
+        if (chatItems.isEmpty()) {
             isHistoryFullyLoaded = true;
 
             if (adapter.getItemCount() == 0) {
                 showView(emptyMessagesLabel);
             }
         }
-        adapter.addItems(messageList);
+        adapter.addItems(chatItems);
     }
 
     private void prepareToolbar() {
         CustomTypefaceSpan robotoMediumSpan = new CustomTypefaceSpan(ROBOTO_MEDIUM);
-        SpannableStringBuilder toolbarTitleBuilder = new SpannableStringBuilder(chatItem.getTitle());
+        SpannableStringBuilder toolbarTitleBuilder = new SpannableStringBuilder(chat.getTitle());
         toolbarTitleBuilder.setSpan(robotoMediumSpan, 0, toolbarTitleBuilder.length(), SPAN_EXCLUSIVE_EXCLUSIVE);
         toolbarTitleBuilder.setSpan(new AbsoluteSizeSpan(16, true), 0, toolbarTitleBuilder.length(), SPAN_EXCLUSIVE_EXCLUSIVE);
         toolbar.setTitle(toolbarTitleBuilder);
 
         String toolbarSubtitleOrigin = plural(
                 toolbar.getContext(), R.plurals.chat_participant,
-                chatItem.getParticipantsCount(), chatItem.getParticipantsCount());
+                chat.getParticipantsCount(), chat.getParticipantsCount());
         CustomTypefaceSpan robotoRegularSpan = new CustomTypefaceSpan(ROBOTO_REGULAR);
         SpannableStringBuilder toolbarSubtitleBuilder = new SpannableStringBuilder(toolbarSubtitleOrigin);
         toolbarSubtitleBuilder.setSpan(robotoRegularSpan, 0, toolbarSubtitleBuilder.length(), SPAN_EXCLUSIVE_EXCLUSIVE);
