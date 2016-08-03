@@ -2,9 +2,9 @@ package com.github.programmerr47.vkdiscussionviewer.chatlistpage;
 
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.util.SparseArray;
 
-import com.github.programmerr47.vkdiscussionviewer.utils.AndroidUtils;
 import com.github.programmerr47.vkdiscussionviewer.utils.ApiUtils;
 import com.vk.sdk.api.VKApi;
 import com.vk.sdk.api.VKError;
@@ -14,23 +14,21 @@ import com.vk.sdk.api.VKResponse;
 import com.vk.sdk.api.model.VKApiDialog;
 import com.vk.sdk.api.model.VKApiGetDialogResponse;
 import com.vk.sdk.api.model.VKApiMessage;
-import com.vk.sdk.api.model.VKApiPhotoSize;
 import com.vk.sdk.api.model.VKList;
-import com.vk.sdk.api.model.VKPhotoSizes;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.github.programmerr47.vkdiscussionviewer.VkApplication.uiHandler;
-import static com.github.programmerr47.vkdiscussionviewer.utils.AndroidUtils.AVATAR_DEFAULT_SIZE;
+import static com.github.programmerr47.vkdiscussionviewer.utils.ApiUtils.getMessageContent;
 
 /**
  * @author Michael Spitsin
  * @since 2016-08-01
  */
 public class RetrieveChatsTask implements Runnable {
-    private static final int PART_COUNT = 100;
+    private static final int PART_COUNT = 200;
     private static final int CHAT_MAX_COUNT = 17;
 
     private final WeakReference<OnChatsReceivedListener> weakListener;
@@ -53,14 +51,17 @@ public class RetrieveChatsTask implements Runnable {
 
     //TODO add labeling attachments (because of empty body field)
     private void requestDialogsPart(final int offset) {
+        Log.v("FUCK", "requestDialogsPArt " + offset);
         VKApi.messages().getDialogs(VKParameters.from("offset", offset, "count", PART_COUNT)).executeSyncWithListener(new VKRequest.VKRequestListener() {
             @Override
             public void onComplete(final VKResponse response) {
                 super.onComplete(response);
+                Log.v("FUCK", "requestDialogsPArt response " + offset);
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
                         VKList<VKApiDialog> dialogs = ((VKApiGetDialogResponse) response.parsedModel).items;
+                        Log.v("FUCK", "requestDialogsPArt response in handler dialogsize = " + dialogs.size());
                         for (int i = 0; i < dialogs.size(); i++) {
                             VKApiMessage message = dialogs.get(i).message;
                             if (message.chat_id != 0) {
@@ -110,14 +111,14 @@ public class RetrieveChatsTask implements Runnable {
                 return new ChatItem()
                         .setChatId(message.chat_id)
                         .setDate(message.date)
-                        .setLastMessage(message.body)
+                        .setLastMessage(getMessageContent(message))
                         .setTitle(message.title)
                         .setUrls(retrieveChatPhoto(message));
             }
 
             private List<String> retrieveChatPhoto(VKApiMessage message) {
                 List<String> urlContainer = new ArrayList<>();
-                String avatarUrl = ApiUtils.getAppropriatePhotoUrl(message.src);
+                String avatarUrl = ApiUtils.getAppropriateAvatarUrl(message.src);
                 if (avatarUrl != null) {
                     urlContainer.add(avatarUrl);
                 }

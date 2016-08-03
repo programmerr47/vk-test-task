@@ -25,6 +25,7 @@ import java.util.concurrent.Future;
 
 import static com.github.programmerr47.vkdiscussionviewer.VkApplication.globalStorage;
 import static com.github.programmerr47.vkdiscussionviewer.VkApplication.uiHandler;
+import static com.github.programmerr47.vkdiscussionviewer.utils.ApiUtils.getMessageContent;
 import static com.vk.sdk.api.model.VKAttachments.TYPE_PHOTO;
 
 /**
@@ -66,7 +67,7 @@ public class GetMessagesTask {
                                                 .setId(apiMessage.id)
                                                 .setAvatarUrl(globalStorage().getUser(apiMessage.user_id).getImageUrl())
                                                 .setDate(apiMessage.date)
-                                                .setContent(apiMessage.body)
+                                                .setContent(getMessageContent(apiMessage))
                                                 .setPhotoSet(PhotoSetCreator.createPhotoSet(apiMessage.attachments)));
                                     }
                                 } catch (Exception e) {

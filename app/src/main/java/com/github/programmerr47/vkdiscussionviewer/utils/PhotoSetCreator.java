@@ -37,8 +37,7 @@ public class PhotoSetCreator {
         if (photos.size() >= 1) {
             VKApiPhoto apiPhoto = photos.get(0);
             VkPhoto photo = new VkPhoto()
-                    .setId(apiPhoto.getId())
-                    .setUrl(apiPhoto.photo_604);
+                    .setId(apiPhoto.getId());
 
             if (apiPhoto.width > PHOTOSET_W_MAX || apiPhoto.height > PHOTOSET_H_MAX) {
                 float newHeight;
@@ -61,6 +60,8 @@ public class PhotoSetCreator {
             } else {
                 photo.setWidth(apiPhoto.width).setHeight(apiPhoto.height);
             }
+
+            photo.setUrl(ApiUtils.getAppropriatePhotoUrl(apiPhoto.src, photo.getWidth(), photo.getHeight()));
 
             photoSet.placePhoto(photo, new Point(margin, margin));
         }

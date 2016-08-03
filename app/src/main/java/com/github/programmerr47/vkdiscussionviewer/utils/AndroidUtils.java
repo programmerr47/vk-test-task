@@ -22,7 +22,6 @@ import static com.github.programmerr47.vkdiscussionviewer.VkApplication.appConte
 public class AndroidUtils {
 
     public static final Point screenSize = new Point();
-    public static final int AVATAR_DEFAULT_SIZE = (int) dp(56);
 
     private AndroidUtils() {}
 

@@ -4,7 +4,6 @@ import android.util.SparseArray;
 
 import com.github.programmerr47.vkdiscussionviewer.model.User;
 import com.github.programmerr47.vkdiscussionviewer.utils.ApiUtils;
-import com.squareup.picasso.Picasso;
 import com.vk.sdk.api.VKApi;
 import com.vk.sdk.api.VKError;
 import com.vk.sdk.api.VKParameters;
@@ -67,7 +66,7 @@ public class ChatListUpdater implements OnChatsReceivedListener {
                         JSONObject userJson = jsonArray.optJSONObject(arrayIndex);
                         VKPhotoSizes userAvatarPhotoSizes = photoSizesFromJson(userJson);
                         int id = userJson.optInt("id");
-                        String photoUrl = ApiUtils.getAppropriatePhotoUrl(userAvatarPhotoSizes);
+                        String photoUrl = ApiUtils.getAppropriateAvatarUrl(userAvatarPhotoSizes);
 
                         globalStorage().cacheUser(new User().setId(id).setImageUrl(photoUrl));
 

@@ -77,6 +77,8 @@ public class VKApiMessage extends VKApiModel implements Identifiable, android.os
      */
     public String body;
 
+    public String action;
+
     public String photo50;
 
     public String photo100;
@@ -121,6 +123,7 @@ public class VKApiMessage extends VKApiModel implements Identifiable, android.os
         out = ParseUtils.parseBoolean(source, "out");
         title = source.optString("title");
         body = source.optString("body");
+        action = source.optString("action");
         attachments .fill(source.optJSONArray("attachments"));
         fwd_messages = new VKList<VKApiMessage>(source.optJSONArray("fwd_messages"), VKApiMessage.class);
         emoji = ParseUtils.parseBoolean(source, "emoji");
@@ -156,6 +159,7 @@ public class VKApiMessage extends VKApiModel implements Identifiable, android.os
         this.out = in.readByte() != 0;
         this.title = in.readString();
         this.body = in.readString();
+        this.action = in.readString();
         this.attachments = in.readParcelable(VKAttachments.class.getClassLoader());
         this.fwd_messages = in.readParcelable(VKList.class.getClassLoader());
         this.emoji = in.readByte() != 0;
@@ -189,6 +193,7 @@ public class VKApiMessage extends VKApiModel implements Identifiable, android.os
         dest.writeByte(out ? (byte) 1 : (byte) 0);
         dest.writeString(this.title);
         dest.writeString(this.body);
+        dest.writeString(this.action);
         dest.writeParcelable(attachments, flags);
         dest.writeParcelable(this.fwd_messages, flags);
         dest.writeByte(emoji ? (byte) 1 : (byte) 0);
