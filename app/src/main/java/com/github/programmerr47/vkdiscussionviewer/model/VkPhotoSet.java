@@ -1,6 +1,5 @@
 package com.github.programmerr47.vkdiscussionviewer.model;
 
-import android.graphics.Point;
 import android.graphics.Rect;
 
 import java.util.ArrayList;
@@ -12,21 +11,21 @@ import java.util.List;
  */
 public class VkPhotoSet {
     private List<VkPhoto> photos = new ArrayList<>();
-    private List<Point> positions = new ArrayList<>();
+    private List<Rect> positions = new ArrayList<>();
 
     private int width;
     private int height;
 
-    public void placePhoto(VkPhoto photo, Point position) {
+    public void placePhoto(VkPhoto photo, Rect position) {
         photos.add(photo);
         positions.add(position);
 
-        if (position.x >= width) {
-            width = position.x + photo.getWidth();
+        if (position.left >= width) {
+            width = position.left + photo.getWidth();
         }
 
-        if (position.y >= height) {
-            height = position.y + photo.getHeight();
+        if (position.top >= height) {
+            height = position.top + photo.getHeight();
         }
     }
 
@@ -34,7 +33,7 @@ public class VkPhotoSet {
         return photos.get(index);
     }
 
-    public Point getPosition(int index) {
+    public Rect photoRect(int index) {
         return positions.get(index);
     }
 
@@ -52,14 +51,5 @@ public class VkPhotoSet {
 
     public int height() {
         return height;
-    }
-
-    public Rect photoRect(int index) {
-        return new Rect(
-                positions.get(index).x,
-                positions.get(index).y,
-                positions.get(index).x + photos.get(index).getWidth(),
-                positions.get(index).y + photos.get(index).getHeight()
-        );
     }
 }
