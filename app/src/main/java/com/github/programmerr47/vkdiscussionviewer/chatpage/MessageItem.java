@@ -129,6 +129,10 @@ public class MessageItem implements ChatItem<MessageItem.Holder> {
         return 0;
     }
 
+    public int getId() {
+        return id;
+    }
+
     public long getDate() {
         return date;
     }

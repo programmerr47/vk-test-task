@@ -1,6 +1,7 @@
 package com.github.programmerr47.vkdiscussionviewer.chatpage;
 
 import android.content.Context;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -15,7 +16,6 @@ import android.widget.TextView;
 
 import com.github.programmerr47.vkdiscussionviewer.R;
 import com.github.programmerr47.vkdiscussionviewer.chatlistpage.Chat;
-import com.github.programmerr47.vkdiscussionviewer.chatpage.ChatItem;
 import com.github.programmerr47.vkdiscussionviewer.pager.Page;
 import com.github.programmerr47.vkdiscussionviewer.utils.CustomTypefaceSpan;
 
@@ -23,6 +23,8 @@ import java.util.List;
 
 import static android.support.v7.widget.LinearLayoutManager.VERTICAL;
 import static android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE;
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
 import static com.github.programmerr47.vkdiscussionviewer.VkApplication.avatarLoader;
 import static com.github.programmerr47.vkdiscussionviewer.utils.AndroidUtils.color;
 import static com.github.programmerr47.vkdiscussionviewer.utils.AndroidUtils.plural;
@@ -36,7 +38,7 @@ import static com.github.programmerr47.vkdiscussionviewer.utils.Constants.Font.R
  * @since 2016-08-01
  */
 public class ChatPage extends Page implements GetMessagesTask.OnMessagesReceivedListener {
-    private final MessageListAdapter adapter = new MessageListAdapter();
+    private final MessageListAdapter adapter;
     private final Chat chat;
     private final GetMessagesTask messagesTask;
 
@@ -51,6 +53,7 @@ public class ChatPage extends Page implements GetMessagesTask.OnMessagesReceived
 
     public ChatPage(Chat chat) {
         this.chat = chat;
+        this.adapter = new MessageListAdapter(chat.getChatId());
         messagesTask = new GetMessagesTask(chat.getChatId(), this);
         uiWorks.add(new Runnable() {
             @Override
@@ -76,30 +79,70 @@ public class ChatPage extends Page implements GetMessagesTask.OnMessagesReceived
         emptyMessagesLabel = bind(R.id.empty_text);
         avatarView = bind(R.id.avatar);
 
+        prepareProgress();
         prepareToolbar();
         prepareList();
         avatarLoader().load(chat, avatarView);
     }
 
     @Override
-    public void onMessagesReceived(int offset, List<ChatItem> chatItems) {
-        if (offset > 0) {
-            adapter.hideLoading();
-        }
-
-        isMessagesLoading = false;
-
-        hideView(progressBar);
-        if (chatItems.isEmpty()) {
-            isHistoryFullyLoaded = true;
-
-            if (adapter.getItemCount() == 0) {
-                showView(emptyMessagesLabel);
-            } else {
-                adapter.addOldestDate();
-            }
+    public void onMessagesReceived(final int offset, List<ChatItem> chatItems, int taskId) {
+        if (taskId == GetMessagesTask.ERROR) {
+            Snackbar.make(getView(), R.string.message_list_error, Snackbar.LENGTH_INDEFINITE)
+                    .setAction(R.string.ok, new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            isMessagesLoading = true;
+                            messagesTask.requestMessages(offset);
+                        }
+                    })
+                    .show();
         } else {
-            adapter.addItems(chatItems);
+            if (offset > 0) {
+                adapter.hideLoading();
+            }
+
+            isMessagesLoading = false;
+            if (progressBar.getVisibility() == VISIBLE) {
+                hideView(progressBar);
+            }
+
+
+            if (chatItems.isEmpty()) {
+                if (taskId == GetMessagesTask.APPEND_NEW_ITEMS) {
+                    isHistoryFullyLoaded = true;
+
+                    if (adapter.getItemCount() == 0) {
+                        showView(emptyMessagesLabel);
+                    } else {
+                        adapter.addOldestDate();
+                    }
+                } else if (taskId == GetMessagesTask.REWRITE_CACHED) {
+                    adapter.rewrite(chatItems);
+                    showView(emptyMessagesLabel);
+                }
+            } else {
+                switch (taskId) {
+                    case GetMessagesTask.REWRITE_CACHED:
+                        adapter.rewrite(chatItems);
+                        break;
+                    case GetMessagesTask.APPEND_NEW_ITEMS:
+                        adapter.addItems(chatItems);
+                        break;
+                    case GetMessagesTask.UPDATE_START_PART:
+                        adapter.addSmallPartToBegin(chatItems);
+                        messagesView.scrollToPosition(0);
+                        break;
+                }
+            }
+        }
+    }
+
+    private void prepareProgress() {
+        if (isMessagesLoading && adapter.getItemCount() == 0) {
+            progressBar.setVisibility(VISIBLE);
+        } else {
+            progressBar.setVisibility(GONE);
         }
     }
 

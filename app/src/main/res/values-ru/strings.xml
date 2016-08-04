@@ -3,6 +3,9 @@
 
     <string name="chat.list.empty">Бесед нет.</string>
     <string name="chat.list.title">Список бесед</string>
+    <string name="message.list.empty">Беседа пуста.</string>
+    <string name="message.list.error">Упс, что-то пошло не так. Попробуйте перезапустить запрос</string>
+    <string name="ok">ОК</string>
 
     <plurals name="chat_participant">
         <item quantity="one">%d участник</item>

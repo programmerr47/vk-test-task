@@ -4,6 +4,8 @@
     <string name="chat.list.empty">There is no discussions.</string>
     <string name="chat.list.title">Discussion list</string>
     <string name="message.list.empty">There is no messages.</string>
+    <string name="message.list.error">Oops! Something happened! Try to reload</string>
+    <string name="ok">OK</string>
     
     <plurals name="chat_participant">
         <item quantity="one">%d participant</item>

@@ -4,11 +4,16 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
+import com.github.programmerr47.vkdiscussionviewer.GlobalStorage;
 import com.github.programmerr47.vkdiscussionviewer.R;
+import com.github.programmerr47.vkdiscussionviewer.VkApplication;
+import com.github.programmerr47.vkdiscussionviewer.utils.AdapterItemsUpdater;
 import com.github.programmerr47.vkdiscussionviewer.utils.DateUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.github.programmerr47.vkdiscussionviewer.VkApplication.globalStorage;
 
 /**
  * @author Michael Spitsin
@@ -17,7 +22,14 @@ import java.util.List;
 public class MessageListAdapter extends RecyclerView.Adapter {
     private static final LoadingItem LOADING_ITEM = new LoadingItem();
 
-    private List<ChatItem> chatItems = new ArrayList<>();
+    private final AdapterItemsUpdater updater = new AdapterItemsUpdater(this);
+    private final int chatId;
+    private final List<ChatItem> chatItems;
+
+    public MessageListAdapter(int chatId) {
+        this.chatId = chatId;
+        chatItems = new ArrayList<>(globalStorage().getChatHistory(chatId));
+    }
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -56,6 +68,18 @@ public class MessageListAdapter extends RecyclerView.Adapter {
     public void hideLoading() {
         chatItems.remove(chatItems.size() - 1);
         notifyItemRemoved(chatItems.size());
+    }
+
+    public void rewrite(List<ChatItem> newItems) {
+        int oldSize = chatItems.size();
+        chatItems.clear();
+        chatItems.addAll(newItems);
+        updater.updateItems(0, newItems.size(), oldSize);
+    }
+
+    public void addSmallPartToBegin(List<ChatItem> items) {
+        chatItems.addAll(0, items);
+        notifyItemRangeInserted(0, items.size());
     }
 
     public void addItems(List<ChatItem> newItems) {
