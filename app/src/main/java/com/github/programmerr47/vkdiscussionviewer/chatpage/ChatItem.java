@@ -8,7 +8,6 @@ import android.view.LayoutInflater;
  * @since 2016-08-04
  */
 public interface ChatItem<T extends RecyclerView.ViewHolder> {
-    RecyclerView.ViewHolder onCreateHolder(LayoutInflater inflater);
     void onBindHolder(T holder, int position);
     int getType();
 }

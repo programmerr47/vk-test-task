@@ -1,5 +1,6 @@
 package com.github.programmerr47.vkdiscussionviewer.chatpage;
 
+import com.github.programmerr47.vkdiscussionviewer.utils.DateUtils;
 import com.github.programmerr47.vkdiscussionviewer.utils.PhotoSetCreator;
 import com.vk.sdk.api.VKApi;
 import com.vk.sdk.api.VKError;
@@ -54,20 +55,25 @@ public class GetMessagesTask {
                                 super.onComplete(response);
                                 VKApiGetMessagesResponse messagesResponse = (VKApiGetMessagesResponse) response.parsedModel;
                                 List<ChatItem> chatItems = new ArrayList<>();
-                                try {
-                                    for (VKApiMessage apiMessage : messagesResponse.items) {
-                                        chatItems.add(new MessageItem()
-                                                .setId(apiMessage.id)
-                                                .setUserId(apiMessage.user_id)
-                                                .setAvatarUrl(globalStorage().getUser(apiMessage.user_id).getImageUrl())
-                                                .setDate(apiMessage.date)
-                                                .setContent(getMessageContent(apiMessage))
-                                                .setPhotoSet(PhotoSetCreator.createPhotoSet(apiMessage.attachments)));
+                                long lastDate = -1;
+                                for (VKApiMessage apiMessage : messagesResponse.items) {
+                                    if (lastDate != -1) {
+                                        int comparison = DateUtils.compareDatesByDay(lastDate, apiMessage.date);
+                                        if (comparison != 0) {
+                                            chatItems.add(new DateItem(lastDate));
+                                        }
                                     }
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                    int t = 5;
+
+                                    chatItems.add(new MessageItem()
+                                            .setId(apiMessage.id)
+                                            .setUserId(apiMessage.user_id)
+                                            .setAvatarUrl(globalStorage().getUser(apiMessage.user_id).getImageUrl())
+                                            .setDate(apiMessage.date)
+                                            .setContent(getMessageContent(apiMessage))
+                                            .setPhotoSet(PhotoSetCreator.createPhotoSet(apiMessage.attachments)));
+                                    lastDate = apiMessage.date;
                                 }
+
                                 GetMessagesTask.this.notify(offset, chatItems);
                             }
 

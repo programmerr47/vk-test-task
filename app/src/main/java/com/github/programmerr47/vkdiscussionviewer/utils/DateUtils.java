@@ -5,6 +5,7 @@ import android.text.format.DateFormat;
 import com.github.programmerr47.vkdiscussionviewer.R;
 
 import java.util.Calendar;
+import java.util.Date;
 
 import static com.github.programmerr47.vkdiscussionviewer.utils.AndroidUtils.string;
 import static java.util.Calendar.DAY_OF_YEAR;
@@ -14,7 +15,7 @@ import static java.util.Calendar.YEAR;
  * @author Michael Spitsin
  * @since 2016-08-01
  */
-public class DateFormatter {
+public class DateUtils {
 
     private static final String TIME_FORMAT = "k:mm";
     private static final String DAY_IN_YEAR_FORMAT = "EEE, d MMMM, k:mm";
@@ -29,7 +30,7 @@ public class DateFormatter {
 
     private static final String SPACE = " ";
 
-    private DateFormatter() {}
+    private DateUtils() {}
 
     public static String formatDate(long dateSeconds) {
         return formatDateMillis(dateSeconds * 1000);
@@ -60,5 +61,25 @@ public class DateFormatter {
 
     private static String capitalizeFistLetter(String sentence) {
         return sentence.substring(0, 1).toUpperCase() + sentence.substring(1);
+    }
+
+    public static int compareDatesByDay(long previousInSeconds, long currentInSeconds) {
+        long previous = previousInSeconds * 1000;
+        long current = currentInSeconds * 1000;
+
+        source.setTimeInMillis(previous);
+        int day1 = source.get(Calendar.DAY_OF_YEAR);
+        int year1 = source.get(Calendar.YEAR);
+        source.setTimeInMillis(current);
+        int day2 = source.get(Calendar.DAY_OF_YEAR);
+        int year2 = source.get(Calendar.YEAR);
+
+        if (year1 != year2) {
+            return year1 > year2 ? 1 : -1;
+        } else if (day1 != day2) {
+            return day1 > day2 ? 1 : -1;
+        }
+
+        return 0;
     }
 }

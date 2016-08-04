@@ -10,7 +10,7 @@ import android.widget.TextView;
 import com.github.programmerr47.vkdiscussionviewer.R;
 import com.github.programmerr47.vkdiscussionviewer.utils.AdapterItemsUpdater;
 import com.github.programmerr47.vkdiscussionviewer.utils.BindViewHolder;
-import com.github.programmerr47.vkdiscussionviewer.utils.DateFormatter;
+import com.github.programmerr47.vkdiscussionviewer.utils.DateUtils;
 
 import java.util.Collections;
 import java.util.List;
@@ -47,7 +47,7 @@ public final class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.
         avatarLoader().load(item, holder.avatarView);
         holder.lastMessageView.setText(item.getLastMessage());
         holder.titleView.setText(item.getTitle());
-        holder.timeView.setText(DateFormatter.formatDate(item.getDate()));
+        holder.timeView.setText(DateUtils.formatDate(item.getDate()));
     }
 
     @Override

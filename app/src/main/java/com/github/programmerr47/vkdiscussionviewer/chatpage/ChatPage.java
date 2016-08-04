@@ -95,9 +95,12 @@ public class ChatPage extends Page implements GetMessagesTask.OnMessagesReceived
 
             if (adapter.getItemCount() == 0) {
                 showView(emptyMessagesLabel);
+            } else {
+                adapter.addOldestDate();
             }
+        } else {
+            adapter.addItems(chatItems);
         }
-        adapter.addItems(chatItems);
     }
 
     private void prepareToolbar() {

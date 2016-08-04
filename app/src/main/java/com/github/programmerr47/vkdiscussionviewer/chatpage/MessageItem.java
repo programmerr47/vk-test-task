@@ -1,8 +1,6 @@
 package com.github.programmerr47.vkdiscussionviewer.chatpage;
 
-import android.support.v7.widget.RecyclerView;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -12,9 +10,13 @@ import com.github.programmerr47.vkdiscussionviewer.R;
 import com.github.programmerr47.vkdiscussionviewer.model.VkPhotoSet;
 import com.github.programmerr47.vkdiscussionviewer.utils.BindViewHolder;
 import com.github.programmerr47.vkdiscussionviewer.utils.CircleTransform;
-import com.github.programmerr47.vkdiscussionviewer.utils.DateFormatter;
+import com.github.programmerr47.vkdiscussionviewer.utils.DateUtils;
 import com.github.programmerr47.vkdiscussionviewer.views.PhotoAttachmentView;
 import com.squareup.picasso.Picasso;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
 
 import static android.text.TextUtils.isEmpty;
 import static android.view.View.GONE;
@@ -29,11 +31,14 @@ import static com.vk.sdk.VKAccessToken.currentToken;
  * @author Michael Spitsin
  * @since 2016-08-02
  */
-public class MessageItem implements ChatItem<MessageItem.MessageItemHolder> {
+public class MessageItem implements ChatItem<MessageItem.Holder> {
+    private final static DateFormat TIME_FORMAT = new SimpleDateFormat("k:mm", Locale.ENGLISH);
+
     private int id;
     private int userId;
     private String avatarUrl;
     private long date;
+    private String dateFormatted;
     private String content;
     private VkPhotoSet photoSet;
 
@@ -54,6 +59,7 @@ public class MessageItem implements ChatItem<MessageItem.MessageItemHolder> {
 
     MessageItem setDate(long date) {
         this.date = date;
+        this.dateFormatted = TIME_FORMAT.format(date * 1000);
         return this;
     }
 
@@ -68,12 +74,7 @@ public class MessageItem implements ChatItem<MessageItem.MessageItemHolder> {
     }
 
     @Override
-    public RecyclerView.ViewHolder onCreateHolder(LayoutInflater inflater) {
-        return new MessageItemHolder(inflater.inflate(R.layout.item_message, null));
-    }
-
-    @Override
-    public void onBindHolder(MessageItemHolder holder, int position) {
+    public void onBindHolder(Holder holder, int position) {
         if (photoSet.isEmpty()) {
             holder.attachmentPhoto.setVisibility(GONE);
         } else {
@@ -89,37 +90,38 @@ public class MessageItem implements ChatItem<MessageItem.MessageItemHolder> {
             holder.textView.setVisibility(VISIBLE);
         }
 
-        RelativeLayout.LayoutParams timeViewParams = (RelativeLayout.LayoutParams) holder.timeView.getLayoutParams();
-        RelativeLayout.LayoutParams messageContentParams = (RelativeLayout.LayoutParams) holder.messageContent.getLayoutParams();
         if (userId != currentToken().userIdInt) {
             holder.messageContent.setBackgroundResource(R.drawable.inbox_message_bg);
 
             Picasso.with(null).load(avatarUrl).transform(CircleTransform.INSTANCE).into(holder.avatarView);
             holder.avatarView.setVisibility(VISIBLE);
 
-            timeViewParams.addRule(ALIGN_PARENT_LEFT, 0);
+            RelativeLayout.LayoutParams timeViewParams = (RelativeLayout.LayoutParams) holder.timeView.getLayoutParams();
             timeViewParams.addRule(LEFT_OF, 0);
-            timeViewParams.addRule(ALIGN_PARENT_RIGHT);
             timeViewParams.addRule(RIGHT_OF, holder.messageContent.getId());
-            holder.timeView.setGravity(Gravity.LEFT);
+            holder.timeView.setLayoutParams(timeViewParams);
+
+            RelativeLayout.LayoutParams messageContentParams = (RelativeLayout.LayoutParams) holder.messageContent.getLayoutParams();
             messageContentParams.addRule(ALIGN_PARENT_RIGHT, 0);
             messageContentParams.addRule(RIGHT_OF, holder.avatarView.getId());
+            holder.messageContent.setLayoutParams(messageContentParams);
         } else {
             holder.messageContent.setBackgroundResource(R.drawable.outbox_message_bg);
 
             holder.avatarView.setVisibility(GONE);
 
-            timeViewParams.addRule(ALIGN_PARENT_RIGHT, 0);
+            RelativeLayout.LayoutParams timeViewParams = (RelativeLayout.LayoutParams) holder.timeView.getLayoutParams();
             timeViewParams.addRule(RIGHT_OF, 0);
-            timeViewParams.addRule(ALIGN_PARENT_LEFT);
             timeViewParams.addRule(LEFT_OF, holder.messageContent.getId());
-            holder.timeView.setGravity(Gravity.RIGHT);
+            holder.timeView.setLayoutParams(timeViewParams);
+
+            RelativeLayout.LayoutParams messageContentParams = (RelativeLayout.LayoutParams) holder.messageContent.getLayoutParams();
             messageContentParams.addRule(RIGHT_OF, 0);
             messageContentParams.addRule(ALIGN_PARENT_RIGHT);
+            holder.messageContent.setLayoutParams(messageContentParams);
         }
-        holder.timeView.setLayoutParams(timeViewParams);
 
-        holder.timeView.setText(DateFormatter.formatDate(date));
+        holder.timeView.setText(dateFormatted);
     }
 
     @Override
@@ -127,7 +129,11 @@ public class MessageItem implements ChatItem<MessageItem.MessageItemHolder> {
         return 0;
     }
 
-    public static final class MessageItemHolder extends BindViewHolder {
+    public long getDate() {
+        return date;
+    }
+
+    public static final class Holder extends BindViewHolder {
         final ImageView avatarView = bind(R.id.avatar);
         final View messageContent = bind(R.id.message_content);
         final TextView textView = bind(R.id.text);
@@ -135,7 +141,7 @@ public class MessageItem implements ChatItem<MessageItem.MessageItemHolder> {
         final TextView timeView = bind(R.id.time);
 
 
-        public MessageItemHolder(View rootView) {
+        public Holder(View rootView) {
             super(rootView);
         }
     }
