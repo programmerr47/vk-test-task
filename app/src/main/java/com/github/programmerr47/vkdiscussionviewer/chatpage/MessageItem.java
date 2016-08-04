@@ -1,6 +1,6 @@
 package com.github.programmerr47.vkdiscussionviewer.chatpage;
 
-import android.view.Gravity;
+import android.text.StaticLayout;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -10,8 +10,7 @@ import com.github.programmerr47.vkdiscussionviewer.R;
 import com.github.programmerr47.vkdiscussionviewer.model.VkPhotoSet;
 import com.github.programmerr47.vkdiscussionviewer.utils.BindViewHolder;
 import com.github.programmerr47.vkdiscussionviewer.utils.CircleTransform;
-import com.github.programmerr47.vkdiscussionviewer.utils.DateUtils;
-import com.github.programmerr47.vkdiscussionviewer.views.PhotoAttachmentView;
+import com.github.programmerr47.vkdiscussionviewer.views.MessageView;
 import com.squareup.picasso.Picasso;
 
 import java.text.DateFormat;
@@ -21,7 +20,6 @@ import java.util.Locale;
 import static android.text.TextUtils.isEmpty;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
-import static android.widget.RelativeLayout.ALIGN_PARENT_LEFT;
 import static android.widget.RelativeLayout.ALIGN_PARENT_RIGHT;
 import static android.widget.RelativeLayout.LEFT_OF;
 import static android.widget.RelativeLayout.RIGHT_OF;
@@ -40,7 +38,7 @@ public class MessageItem implements ChatItem<MessageItem.Holder> {
     private long date;
     private String dateFormatted;
     private String content;
-    private VkPhotoSet photoSet;
+    private VkPhotoSet photoSet = new VkPhotoSet();
 
     MessageItem setId(int id) {
         this.id = id;
@@ -75,20 +73,7 @@ public class MessageItem implements ChatItem<MessageItem.Holder> {
 
     @Override
     public void onBindHolder(Holder holder, int position) {
-        if (photoSet.isEmpty()) {
-            holder.attachmentPhoto.setVisibility(GONE);
-        } else {
-            holder.attachmentPhoto.setVisibility(VISIBLE);
-        }
-
-        holder.attachmentPhoto.setPhotoSet(photoSet);
-
-        if (isEmpty(content)) {
-            holder.textView.setVisibility(GONE);
-        } else {
-            holder.textView.setText(content);
-            holder.textView.setVisibility(VISIBLE);
-        }
+        holder.attachmentPhoto.setMessage(this);
 
         if (userId != currentToken().userIdInt) {
             holder.messageContent.setBackgroundResource(R.drawable.inbox_message_bg);
@@ -137,11 +122,27 @@ public class MessageItem implements ChatItem<MessageItem.Holder> {
         return date;
     }
 
+    public String getDateFormatted() {
+        return dateFormatted;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public VkPhotoSet getPhotoSet() {
+        return photoSet;
+    }
+
+    public boolean isOwner() {
+        return userId == currentToken().userIdInt;
+    }
+
     public static final class Holder extends BindViewHolder {
         final ImageView avatarView = bind(R.id.avatar);
         final View messageContent = bind(R.id.message_content);
         final TextView textView = bind(R.id.text);
-        final PhotoAttachmentView attachmentPhoto = bind(R.id.attachment_photo);
+        final MessageView attachmentPhoto = bind(R.id.attachment_photo);
         final TextView timeView = bind(R.id.time);
 
 
