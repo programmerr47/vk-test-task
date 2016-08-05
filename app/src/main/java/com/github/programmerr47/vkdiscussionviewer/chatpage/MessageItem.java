@@ -74,8 +74,6 @@ public class MessageItem implements ChatItem<MessageItem.Holder> {
         holder.messageView.setMessage(this);
 
         if (userId != currentToken().userIdInt) {
-            Picasso.with(null).load(avatarUrl).transform(CircleTransform.INSTANCE).into(holder.avatarView);
-            holder.avatarView.setVisibility(VISIBLE);
 
             RelativeLayout.LayoutParams timeViewParams = (RelativeLayout.LayoutParams) holder.timeView.getLayoutParams();
             timeViewParams.addRule(LEFT_OF, 0);
@@ -84,18 +82,14 @@ public class MessageItem implements ChatItem<MessageItem.Holder> {
 
             RelativeLayout.LayoutParams messageContentParams = (RelativeLayout.LayoutParams) holder.messageView.getLayoutParams();
             messageContentParams.addRule(ALIGN_PARENT_RIGHT, 0);
-            messageContentParams.addRule(RIGHT_OF, holder.avatarView.getId());
             holder.messageView.setLayoutParams(messageContentParams);
         } else {
-            holder.avatarView.setVisibility(GONE);
-
             RelativeLayout.LayoutParams timeViewParams = (RelativeLayout.LayoutParams) holder.timeView.getLayoutParams();
             timeViewParams.addRule(RIGHT_OF, 0);
             timeViewParams.addRule(LEFT_OF, holder.messageView.getId());
             holder.timeView.setLayoutParams(timeViewParams);
 
             RelativeLayout.LayoutParams messageContentParams = (RelativeLayout.LayoutParams) holder.messageView.getLayoutParams();
-            messageContentParams.addRule(RIGHT_OF, 0);
             messageContentParams.addRule(ALIGN_PARENT_RIGHT);
             holder.messageView.setLayoutParams(messageContentParams);
         }
@@ -128,12 +122,15 @@ public class MessageItem implements ChatItem<MessageItem.Holder> {
         return photoSet;
     }
 
+    public String getAvatarUrl() {
+        return avatarUrl;
+    }
+
     public boolean isOwner() {
         return userId == currentToken().userIdInt;
     }
 
     public static final class Holder extends BindViewHolder {
-        final ImageView avatarView = bind(R.id.avatar);
         final MessageView messageView = bind(R.id.attachment_photo);
         final TextView timeView = bind(R.id.time);
 

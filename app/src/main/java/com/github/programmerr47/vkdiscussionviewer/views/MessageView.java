@@ -21,6 +21,7 @@ import com.github.programmerr47.vkdiscussionviewer.R;
 import com.github.programmerr47.vkdiscussionviewer.chatpage.MessageItem;
 import com.github.programmerr47.vkdiscussionviewer.model.VkPhotoSet;
 import com.github.programmerr47.vkdiscussionviewer.utils.AndroidUtils;
+import com.github.programmerr47.vkdiscussionviewer.utils.CircleTransform;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
@@ -57,7 +58,8 @@ public class MessageView extends View {
     private MessageItem message;
 
     private Drawable currentBackground;
-
+    private Drawable avatarDrawable;
+    private DrawableTarget avatarTarget;
     private Drawable[] photoSetDrawables = new Drawable[0];
     private BitmapTarget[] targets = new BitmapTarget[0];
 
@@ -87,7 +89,8 @@ public class MessageView extends View {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        int originWidth = Math.max(message.getPhotoSet().width(), getTextLayoutWidth());
+        int contentWidth = Math.max(message.getPhotoSet().width(), getTextLayoutWidth());
+        int originWidth =  contentWidth + (message.isOwner() ? 0 : (int)avatarSize);
         int originHeight = message.getPhotoSet().height();
         if (textLayout != null) {
             originHeight += textLayout.getHeight() + 2 * textMarginVertical;
@@ -104,10 +107,19 @@ public class MessageView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+        if (!message.isOwner()) {
+            avatarDrawable.draw(canvas);
+        }
+
+        int avatarOffset = message.isOwner() ? 0 : (int)avatarSize;
         int bgXOffset = bgBoundsWidth / 2 + (message.isOwner() ? 0 : bgTongueWidth);
+        canvas.save();
+        canvas.translate(avatarOffset, 0);
         currentBackground.draw(canvas);
-        drawText(canvas, bgXOffset);
-        drawPhotoSet(canvas, bgXOffset);
+        canvas.restore();
+
+        drawText(canvas, bgXOffset + avatarOffset);
+        drawPhotoSet(canvas, bgXOffset + avatarOffset);
     }
 
     private void drawText(Canvas canvas, int bgXOffset) {
@@ -145,6 +157,10 @@ public class MessageView extends View {
             }
         }
 
+        if (avatarDrawable == drawable) {
+            return true;
+        }
+
         return super.verifyDrawable(drawable);
     }
 
@@ -173,7 +189,7 @@ public class MessageView extends View {
         }
 
         setBackgroundBounds();
-        updatePhotoSet(message.getPhotoSet());
+        updatePhotos(message);
         requestLayout();
         invalidate();
     }
@@ -186,6 +202,24 @@ public class MessageView extends View {
         }
 
         currentBackground.setBounds(0, 0, contentWidth + bgBoundsWidth + bgTongueWidth, contentHeight + bgBoundsHeight);
+    }
+
+    private void updatePhotos(MessageItem message) {
+        updateAvatar(message);
+        updatePhotoSet(message.getPhotoSet());
+    }
+
+    private void updateAvatar(MessageItem message) {
+        if (avatarTarget != null) {
+            avatarTarget.clear();
+        }
+
+        avatarDrawable = new ColorDrawable(0x00000000);
+        avatarDrawable.setBounds(0, 0, (int)avatarSize, (int)avatarSize);
+        if (!message.isOwner()) {
+            avatarTarget = new AvatarTarget(this);
+            Picasso.with(null).load(message.getAvatarUrl()).transform(CircleTransform.INSTANCE).into(avatarTarget);
+        }
     }
 
     private void updatePhotoSet(VkPhotoSet photoSet) {
@@ -259,18 +293,15 @@ public class MessageView extends View {
         }
     }
 
-    private static final class BitmapTarget implements Target {
-        private final int id;
-        private MessageView targetView;
+    private static abstract class DrawableTarget implements Target {
+        protected MessageView targetView;
 
-        public BitmapTarget(int id, MessageView targetView) {
-            this.id = id;
+        public DrawableTarget(MessageView targetView) {
             this.targetView = targetView;
         }
 
         @Override
         public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-            Log.v("FUCK", "Id: " + id + " onBitmapLoaded");
             if (targetView != null) {
                 final Drawable resultDrawable;
 
@@ -278,7 +309,7 @@ public class MessageView extends View {
                     resultDrawable = new BitmapDrawable(targetView.getResources(), bitmap);
                 } else {
                     resultDrawable = new TransitionDrawable(new Drawable[]{
-                            targetView.getDrawable(id),
+                            getTargetViewDrawable(),
                             new BitmapDrawable(targetView.getResources(), bitmap)});
                 }
                 resultDrawable.setCallback(targetView);
@@ -289,30 +320,66 @@ public class MessageView extends View {
 
         @Override
         public void onBitmapFailed(Drawable errorDrawable) {
-            Log.v("FUCK", "Id: " + id + " onBitmapFailed");
             if (targetView != null) {
                 changeDrawable(errorDrawable);
             }
         }
 
         @Override
-        public void onPrepareLoad(Drawable placeHolderDrawable) {
-            Log.v("FUCK", "Id: " + id + " onPrepareLoad");
-        }
+        public void onPrepareLoad(Drawable placeHolderDrawable) {}
 
         public void clear() {
-            Log.v("FUCK", "Bitmap target with id " + id + " cleared");
             targetView = null;
         }
 
         private void changeDrawable(Drawable drawable) {
-            Rect bounds = targetView.getDrawable(id).getBounds();
+            Rect bounds = getTargetViewDrawable().getBounds();
             drawable.setBounds(bounds);
 
             if (drawable instanceof TransitionDrawable) {
                 ((TransitionDrawable) drawable).startTransition(FADE_TRANSITION_DURATION);
             }
 
+            updateTargetViewDrawable(drawable);
+        }
+
+        protected abstract Drawable getTargetViewDrawable();
+
+        protected abstract void updateTargetViewDrawable(Drawable drawable);
+    }
+
+    private static final class AvatarTarget  extends DrawableTarget {
+        public AvatarTarget(MessageView targetView) {
+            super(targetView);
+        }
+
+        @Override
+        protected Drawable getTargetViewDrawable() {
+            return targetView.avatarDrawable;
+        }
+
+        @Override
+        protected void updateTargetViewDrawable(Drawable drawable) {
+            targetView.avatarDrawable = drawable;
+            targetView.invalidate();
+        }
+    }
+
+    private static final class BitmapTarget extends DrawableTarget {
+        private final int id;
+
+        public BitmapTarget(int id, MessageView targetView) {
+            super(targetView);
+            this.id = id;
+        }
+
+        @Override
+        protected Drawable getTargetViewDrawable() {
+            return targetView.getDrawable(id);
+        }
+
+        @Override
+        protected void updateTargetViewDrawable(Drawable drawable) {
             targetView.setDrawable(id, drawable);
         }
     }
