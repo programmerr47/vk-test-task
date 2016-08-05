@@ -8,7 +8,6 @@ import android.support.v7.widget.Toolbar;
 import android.text.SpannableStringBuilder;
 import android.text.style.AbsoluteSizeSpan;
 import android.text.style.ForegroundColorSpan;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -68,16 +67,17 @@ public class ChatPage extends Page implements GetMessagesTask.OnMessagesReceived
 
     @Override
     public View onCreateView(Context context) {
-        return LayoutInflater.from(context).inflate(R.layout.page_chat, null);
+        return new ChatPageLayout(context);
     }
 
     @Override
     public void onViewCreated(View pageView) {
-        toolbar = bind(R.id.toolbar);
-        messagesView = bind(R.id.list);
-        progressBar = bind(R.id.progress);
-        emptyMessagesLabel = bind(R.id.empty_text);
-        avatarView = bind(R.id.avatar);
+        ChatPageLayout layout = (ChatPageLayout) pageView;
+        toolbar = layout.getToolbar();
+        messagesView = layout.getMessageListView();
+        progressBar = layout.getProgressBar();
+        emptyMessagesLabel = layout.getEmptyMessageView();
+        avatarView = layout.getAvatarView();
 
         prepareProgress();
         prepareToolbar();

@@ -13,9 +13,11 @@ import android.graphics.drawable.TransitionDrawable;
 import android.os.Build;
 import android.text.StaticLayout;
 import android.text.TextPaint;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 
 import com.github.programmerr47.vkdiscussionviewer.R;
 import com.github.programmerr47.vkdiscussionviewer.chatpage.MessageItem;
@@ -91,7 +93,7 @@ public class MessageView extends View {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         int contentWidth = Math.max(message.getPhotoSet().width(), getTextLayoutWidth());
-        int originWidth =  contentWidth + (message.isOwner() ? 0 : avatarSize);
+        int originWidth =  contentWidth + (message.isOwner() || isEmpty(message.getAvatarUrl()) ? 0 : avatarSize);
         int originHeight = message.getPhotoSet().height();
         if (textLayout != null) {
             originHeight += textLayout.getHeight() + 2 * textMarginVertical;
@@ -108,10 +110,10 @@ public class MessageView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        if (!message.isOwner()) {
+        if (!message.isOwner() && !isEmpty(message.getAvatarUrl())) {
             avatarDrawable.draw(canvas);
         }
-        int avatarOffset = message.isOwner() ? 0 : avatarSize;
+        int avatarOffset = message.isOwner() || isEmpty(message.getAvatarUrl()) ? 0 : avatarSize;
 
         canvas.save();
         canvas.translate(0, getMeasuredHeight() - timeLayout.getHeight() - timeDistance);
@@ -224,11 +226,13 @@ public class MessageView extends View {
             avatarTarget.clear();
         }
 
-        avatarDrawable = new ColorDrawable(0x00000000);
-        avatarDrawable.setBounds(0, 0, avatarSize, avatarSize);
-        if (!message.isOwner()) {
-            avatarTarget = new AvatarTarget(this);
-            Picasso.with(null).load(message.getAvatarUrl()).transform(CircleTransform.INSTANCE).into(avatarTarget);
+        if (!isEmpty(message.getAvatarUrl())) {
+            avatarDrawable = new ColorDrawable(0x00000000);
+            avatarDrawable.setBounds(0, 0, avatarSize, avatarSize);
+            if (!message.isOwner()) {
+                avatarTarget = new AvatarTarget(this);
+                Picasso.with(null).load(message.getAvatarUrl()).transform(CircleTransform.INSTANCE).into(avatarTarget);
+            }
         }
     }
 

@@ -6,7 +6,7 @@ package com.github.programmerr47.vkdiscussionviewer.model;
  */
 public class User {
     private int id;
-    private String imageUrl;
+    private String imageUrl = "";
 
     public User setId(int id) {
         this.id = id;

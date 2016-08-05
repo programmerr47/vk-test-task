@@ -26,6 +26,10 @@ public class GlobalStorage {
         return userMap.get(id);
     }
 
+    public boolean hasUser(int id) {
+        return userMap.indexOfKey(id) >= 0;
+    }
+
     public void cacheMessageNewSmallPart(int chatId, List<ChatItem> chatPart) {
         lazyGetChat(chatId).addAll(0, chatPart);
     }

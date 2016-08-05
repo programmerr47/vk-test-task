@@ -1,5 +1,6 @@
 package com.github.programmerr47.vkdiscussionviewer.chatpage;
 
+import com.github.programmerr47.vkdiscussionviewer.model.User;
 import com.github.programmerr47.vkdiscussionviewer.utils.DateUtils;
 import com.github.programmerr47.vkdiscussionviewer.utils.PhotoSetCreator;
 import com.vk.sdk.api.VKApi;
@@ -76,6 +77,10 @@ public class GetMessagesTask {
                                         globalStorage().cacheMessageNewSmallPart(chatId, chatItems);
                                         GetMessagesTask.this.notify(offset, chatItems, UPDATE_START_PART);
                                         return;
+                                    }
+
+                                    if (!globalStorage().hasUser(apiMessage.user_id)) {
+                                        globalStorage().cacheUser(new User().setId(apiMessage.user_id));
                                     }
 
                                     chatItems.add(new MessageItem()

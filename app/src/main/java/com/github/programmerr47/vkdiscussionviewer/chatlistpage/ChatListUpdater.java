@@ -50,6 +50,11 @@ public class ChatListUpdater implements OnChatsReceivedListener {
     @Override
     public void onChatsReceived(final List<Chat> chats, final SparseArray<Chat> chatMap) {
         String idSequence = toIdSequence(chats);
+        if (idSequence.isEmpty()) {
+            listener.onChatsReady(chats);
+            return;
+        }
+
         VKApi.messages().getChatUsers(VKParameters.from("chat_ids", idSequence, "fields", "photo,photo_50,photo_100,photo_200")).executeWithListener(new VKRequest.VKRequestListener() {
             @Override
             public void onComplete(VKResponse response) {
@@ -125,6 +130,10 @@ public class ChatListUpdater implements OnChatsReceivedListener {
     }
 
     private String toIdSequence(List<Chat> chats) {
+        if (chats.isEmpty()) {
+            return "";
+        }
+
         StringBuilder resultBuilder = new StringBuilder("" + chats.get(0).getChatId());
         for (int i = 1; i < chats.size(); i++) {
             resultBuilder.append(",").append(chats.get(i).getChatId());
