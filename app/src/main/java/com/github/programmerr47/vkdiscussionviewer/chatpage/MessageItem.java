@@ -74,27 +74,14 @@ public class MessageItem implements ChatItem<MessageItem.Holder> {
         holder.messageView.setMessage(this);
 
         if (userId != currentToken().userIdInt) {
-
-            RelativeLayout.LayoutParams timeViewParams = (RelativeLayout.LayoutParams) holder.timeView.getLayoutParams();
-            timeViewParams.addRule(LEFT_OF, 0);
-            timeViewParams.addRule(RIGHT_OF, holder.messageView.getId());
-            holder.timeView.setLayoutParams(timeViewParams);
-
             RelativeLayout.LayoutParams messageContentParams = (RelativeLayout.LayoutParams) holder.messageView.getLayoutParams();
             messageContentParams.addRule(ALIGN_PARENT_RIGHT, 0);
             holder.messageView.setLayoutParams(messageContentParams);
         } else {
-            RelativeLayout.LayoutParams timeViewParams = (RelativeLayout.LayoutParams) holder.timeView.getLayoutParams();
-            timeViewParams.addRule(RIGHT_OF, 0);
-            timeViewParams.addRule(LEFT_OF, holder.messageView.getId());
-            holder.timeView.setLayoutParams(timeViewParams);
-
             RelativeLayout.LayoutParams messageContentParams = (RelativeLayout.LayoutParams) holder.messageView.getLayoutParams();
             messageContentParams.addRule(ALIGN_PARENT_RIGHT);
             holder.messageView.setLayoutParams(messageContentParams);
         }
-
-        holder.timeView.setText(dateFormatted);
     }
 
     @Override
@@ -132,7 +119,6 @@ public class MessageItem implements ChatItem<MessageItem.Holder> {
 
     public static final class Holder extends BindViewHolder {
         final MessageView messageView = bind(R.id.attachment_photo);
-        final TextView timeView = bind(R.id.time);
 
         public Holder(View rootView) {
             super(rootView);

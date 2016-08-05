@@ -48,7 +48,8 @@ public class MessageView extends View {
     private final Drawable inboxBg = appContext().getResources().getDrawable(R.drawable.inbox_message_bg);
     private final Drawable outboxBg = appContext().getResources().getDrawable(R.drawable.outbox_message_bg);
 
-    private final float avatarSize = dp(getContext(), 40);
+    private final int avatarSize = (int)dp(getContext(), 40);
+    private final float timeDistance = dp(getContext(), 8);
     private final float textMarginHorizontal = dp(getContext(), 6);
     private final float textMarginVertical = dp(getContext(), 12);
     private final int bgBoundsWidth = (int)dp(getContext(), 14);
@@ -90,13 +91,13 @@ public class MessageView extends View {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         int contentWidth = Math.max(message.getPhotoSet().width(), getTextLayoutWidth());
-        int originWidth =  contentWidth + (message.isOwner() ? 0 : (int)avatarSize);
+        int originWidth =  contentWidth + (message.isOwner() ? 0 : avatarSize);
         int originHeight = message.getPhotoSet().height();
         if (textLayout != null) {
             originHeight += textLayout.getHeight() + 2 * textMarginVertical;
         }
 
-        originWidth += bgBoundsWidth + bgTongueWidth;
+        originWidth += bgBoundsWidth + bgTongueWidth + timeDistance + timeLayout.getWidth();
         originHeight += bgBoundsHeight;
 
         int w = resolveSizeAndState(originWidth, widthMeasureSpec, 0);
@@ -110,16 +111,25 @@ public class MessageView extends View {
         if (!message.isOwner()) {
             avatarDrawable.draw(canvas);
         }
+        int avatarOffset = message.isOwner() ? 0 : avatarSize;
 
-        int avatarOffset = message.isOwner() ? 0 : (int)avatarSize;
+        canvas.save();
+        canvas.translate(0, getMeasuredHeight() - timeLayout.getHeight() - timeDistance);
+        if (!message.isOwner()) {
+            canvas.translate(getMeasuredWidth() - timeLayout.getWidth(), 0);
+        }
+        timeLayout.draw(canvas);
+        canvas.restore();
+        int timeOffset = message.isOwner() ? timeLayout.getWidth() + (int)timeDistance : 0;
+
         int bgXOffset = bgBoundsWidth / 2 + (message.isOwner() ? 0 : bgTongueWidth);
         canvas.save();
-        canvas.translate(avatarOffset, 0);
+        canvas.translate(avatarOffset + timeOffset, 0);
         currentBackground.draw(canvas);
         canvas.restore();
 
-        drawText(canvas, bgXOffset + avatarOffset);
-        drawPhotoSet(canvas, bgXOffset + avatarOffset);
+        drawText(canvas, bgXOffset + avatarOffset + timeOffset);
+        drawPhotoSet(canvas, bgXOffset + avatarOffset + timeOffset);
     }
 
     private void drawText(Canvas canvas, int bgXOffset) {
@@ -169,7 +179,7 @@ public class MessageView extends View {
 
         currentBackground = message.isOwner() ? outboxBg : inboxBg;
         TextPaint messagePaint = message.isOwner() ? ownerMessagePaint : otherMessagePaint;
-        float avatarSize = message.isOwner() ? 0 : (int)this.avatarSize;
+        float avatarSize = message.isOwner() ? 0 : this.avatarSize;
 
         String time = message.getDateFormatted();
         int timeWidth = (int) Math.ceil(timePaint.measureText(time, 0, time.length()));
@@ -177,7 +187,7 @@ public class MessageView extends View {
 
         String text = message.getContent();
         if (!isEmpty(text)) {
-            final int textMaxWidth = (int)(AndroidUtils.screenSize.x - currentBackground.getMinimumWidth() - dp(40) - timeWidth - avatarSize);
+            final int textMaxWidth = (int)(AndroidUtils.screenSize.x - currentBackground.getMinimumWidth() - dp(24) - timeDistance - timeWidth - avatarSize);
             int textWidth = (int) Math.ceil(messagePaint.measureText(text, 0, text.length()));
             if (textWidth > textMaxWidth) {
                 textWidth = textMaxWidth;
@@ -215,7 +225,7 @@ public class MessageView extends View {
         }
 
         avatarDrawable = new ColorDrawable(0x00000000);
-        avatarDrawable.setBounds(0, 0, (int)avatarSize, (int)avatarSize);
+        avatarDrawable.setBounds(0, 0, avatarSize, avatarSize);
         if (!message.isOwner()) {
             avatarTarget = new AvatarTarget(this);
             Picasso.with(null).load(message.getAvatarUrl()).transform(CircleTransform.INSTANCE).into(avatarTarget);
