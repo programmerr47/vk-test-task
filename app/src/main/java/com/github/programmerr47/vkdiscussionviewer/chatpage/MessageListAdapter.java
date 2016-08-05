@@ -4,9 +4,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
-import com.github.programmerr47.vkdiscussionviewer.GlobalStorage;
 import com.github.programmerr47.vkdiscussionviewer.R;
-import com.github.programmerr47.vkdiscussionviewer.VkApplication;
 import com.github.programmerr47.vkdiscussionviewer.utils.AdapterItemsUpdater;
 import com.github.programmerr47.vkdiscussionviewer.utils.DateUtils;
 
@@ -23,11 +21,9 @@ public class MessageListAdapter extends RecyclerView.Adapter {
     private static final LoadingItem LOADING_ITEM = new LoadingItem();
 
     private final AdapterItemsUpdater updater = new AdapterItemsUpdater(this);
-    private final int chatId;
     private final List<ChatItem> chatItems;
 
     public MessageListAdapter(int chatId) {
-        this.chatId = chatId;
         chatItems = new ArrayList<>(globalStorage().getChatHistory(chatId));
     }
 

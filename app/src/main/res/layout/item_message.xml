@@ -11,52 +11,9 @@
     android:paddingTop="5dp"
     android:paddingBottom="5dp">
 
-    <ImageView
-        android:id="@+id/avatar"
-        android:layout_width="40dp"
-        android:layout_height="40dp"/>
-
-    <LinearLayout
-        android:id="@+id/message_content"
+    <com.github.programmerr47.vkdiscussionviewer.views.MessageView
+        android:id="@+id/attachment_photo"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/avatar"
-        android:layout_toEndOf="@id/avatar"
-        android:orientation="vertical"
-        android:background="@drawable/inbox_message_bg">
-
-        <TextView
-            android:id="@+id/text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="6dp"
-            android:layout_marginStart="6dp"
-            android:layout_marginRight="6dp"
-            android:layout_marginEnd="6dp"
-            android:text="Сообщение, которое стало слишком длинным, чтобы помещаться в экран, так что делай выводы, мужик"
-            android:textSize="16sp"
-            android:textColor="@color/text_primary"/>
-
-        <com.github.programmerr47.vkdiscussionviewer.views.PhotoAttachmentView
-            android:id="@+id/attachment_photo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-
-    </LinearLayout>
-
-    <TextView
-        android:id="@+id/time"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/message_content"
-        android:layout_alignParentBottom="true"
-        android:layout_marginLeft="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginEnd="8dp"
-        android:paddingBottom="16dp"
-        android:text="20:32"
-        android:textSize="12sp"
-        android:textColor="@color/text_secondary_dark"/>
+        android:layout_height="wrap_content"/>
 
 </RelativeLayout>
