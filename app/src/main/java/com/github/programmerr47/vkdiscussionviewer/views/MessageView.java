@@ -11,10 +11,8 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.TransitionDrawable;
 import android.os.Build;
-import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
-import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
@@ -40,19 +38,26 @@ import static com.github.programmerr47.vkdiscussionviewer.utils.Constants.Font.R
  * @since 2016-08-03
  */
 public class MessageView extends View {
-    private static final Drawable INBOX_BG = appContext().getResources().getDrawable(R.drawable.inbox_message_bg);
-    private static final Drawable OUTBOX_BG = appContext().getResources().getDrawable(R.drawable.outbox_message_bg);
-
     private static final int FADE_TRANSITION_DURATION = 300;
 
     private static TextPaint ownerMessagePaint;
     private static TextPaint otherMessagePaint;
     private static TextPaint timePaint;
 
+    private final Drawable inboxBg = appContext().getResources().getDrawable(R.drawable.inbox_message_bg);
+    private final Drawable outboxBg = appContext().getResources().getDrawable(R.drawable.outbox_message_bg);
+
     private final float avatarSize = dp(getContext(), 40);
-    private final float textImageDistance = dp(getContext(), 16);
+    private final float textMarginHorizontal = dp(getContext(), 6);
+    private final float textMarginVertical = dp(getContext(), 12);
+    private final int bgBoundsWidth = (int)dp(getContext(), 14);
+    private final int bgBoundsHeight = (int)dp(getContext(), 12);
+    private final int bgTongueWidth = (int)dp(getContext(), 9);
 
     private MessageItem message;
+
+    private Drawable currentBackground;
+
     private Drawable[] photoSetDrawables = new Drawable[0];
     private BitmapTarget[] targets = new BitmapTarget[0];
 
@@ -85,12 +90,11 @@ public class MessageView extends View {
         int originWidth = Math.max(message.getPhotoSet().width(), getTextLayoutWidth());
         int originHeight = message.getPhotoSet().height();
         if (textLayout != null) {
-            if (originHeight != 0) {
-                originHeight += textImageDistance;
-            }
-
-            originHeight += textLayout.getHeight();
+            originHeight += textLayout.getHeight() + 2 * textMarginVertical;
         }
+
+        originWidth += bgBoundsWidth + bgTongueWidth;
+        originHeight += bgBoundsHeight;
 
         int w = resolveSizeAndState(originWidth, widthMeasureSpec, 0);
         int h = resolveSizeAndState(originHeight, heightMeasureSpec, 0);
@@ -100,24 +104,38 @@ public class MessageView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+        int bgXOffset = bgBoundsWidth / 2 + (message.isOwner() ? 0 : bgTongueWidth);
+        currentBackground.draw(canvas);
+        drawText(canvas, bgXOffset);
+        drawPhotoSet(canvas, bgXOffset);
+    }
 
-        if (textLayout != null) {
-            textLayout.draw(canvas);
-        }
-
+    private void drawText(Canvas canvas, int bgXOffset) {
         if (textLayout != null) {
             canvas.save();
-            canvas.translate(0, textLayout.getHeight() + textImageDistance);
+            canvas.translate(
+                    textMarginHorizontal + bgXOffset,
+                    textMarginVertical + bgBoundsHeight / 2);
+            textLayout.draw(canvas);
+            canvas.restore();
+        }
+    }
+
+    private void drawPhotoSet(Canvas canvas, int bgXOffset) {
+        canvas.save();
+        canvas.translate(bgXOffset, bgBoundsHeight / 2);
+
+        if (textLayout != null) {
+            canvas.translate(0, textLayout.getHeight() + 2 * textMarginVertical);
         }
 
         for (int i = 0; i < photoSetDrawables.length; i++) {
             photoSetDrawables[i].draw(canvas);
         }
 
-        if (textLayout != null) {
-            canvas.restore();
-        }
+        canvas.restore();
     }
+
 
     @Override
     protected boolean verifyDrawable(Drawable drawable) {
@@ -133,7 +151,7 @@ public class MessageView extends View {
     public void setMessage(MessageItem message) {
         this.message = message;
 
-        Drawable messageBg = message.isOwner() ? OUTBOX_BG : INBOX_BG;
+        currentBackground = message.isOwner() ? outboxBg : inboxBg;
         TextPaint messagePaint = message.isOwner() ? ownerMessagePaint : otherMessagePaint;
         float avatarSize = message.isOwner() ? 0 : (int)this.avatarSize;
 
@@ -143,7 +161,7 @@ public class MessageView extends View {
 
         String text = message.getContent();
         if (!isEmpty(text)) {
-            final int textMaxWidth = (int)(AndroidUtils.screenSize.x - messageBg.getMinimumWidth() - dp(40) - timeWidth - avatarSize);
+            final int textMaxWidth = (int)(AndroidUtils.screenSize.x - currentBackground.getMinimumWidth() - dp(40) - timeWidth - avatarSize);
             int textWidth = (int) Math.ceil(messagePaint.measureText(text, 0, text.length()));
             if (textWidth > textMaxWidth) {
                 textWidth = textMaxWidth;
@@ -154,9 +172,20 @@ public class MessageView extends View {
             textLayout = null;
         }
 
+        setBackgroundBounds();
         updatePhotoSet(message.getPhotoSet());
         requestLayout();
         invalidate();
+    }
+
+    private void setBackgroundBounds() {
+        int contentWidth = Math.max(message.getPhotoSet().width(), getTextLayoutWidth());
+        int contentHeight = message.getPhotoSet().height();
+        if (textLayout != null) {
+            contentHeight += textLayout.getHeight() + 2 * textMarginVertical;
+        }
+
+        currentBackground.setBounds(0, 0, contentWidth + bgBoundsWidth + bgTongueWidth, contentHeight + bgBoundsHeight);
     }
 
     private void updatePhotoSet(VkPhotoSet photoSet) {
@@ -223,6 +252,7 @@ public class MessageView extends View {
                 width = textLayout.getWidth();
             }
 
+            width += 2 * textMarginHorizontal;
             return width;
         } else {
             return 0;
