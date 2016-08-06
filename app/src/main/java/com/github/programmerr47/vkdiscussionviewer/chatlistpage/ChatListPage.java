@@ -1,6 +1,7 @@
 package com.github.programmerr47.vkdiscussionviewer.chatlistpage;
 
 import android.content.Context;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -16,6 +17,7 @@ import com.github.programmerr47.vkdiscussionviewer.chatlistpage.ChatListAdapter.
 import com.github.programmerr47.vkdiscussionviewer.chatpage.ChatPage;
 import com.github.programmerr47.vkdiscussionviewer.pager.Page;
 import com.github.programmerr47.vkdiscussionviewer.utils.CustomTypefaceSpan;
+import com.vk.sdk.api.VKError;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +40,7 @@ public final class ChatListPage extends Page implements OnChatsPreparedListener,
     private ChatListAdapter adapter = new ChatListAdapter(this);
     private List<Chat> chats = new ArrayList<>();
     private boolean isChatsLoaded;
+    private boolean wasError;
 
     private Toolbar toolbar;
     private RecyclerView recyclerView;
@@ -61,10 +64,14 @@ public final class ChatListPage extends Page implements OnChatsPreparedListener,
 
         if (isChatsLoaded) {
             progressBar.setVisibility(GONE);
-            if (chats.isEmpty()) {
+            if (chats.isEmpty() && !wasError) {
                 emptyListLabel.setVisibility(VISIBLE);
             } else {
                 emptyListLabel.setVisibility(GONE);
+            }
+
+            if (wasError) {
+                showErrorMessage();
             }
         } else {
             progressBar.setVisibility(VISIBLE);
@@ -76,6 +83,7 @@ public final class ChatListPage extends Page implements OnChatsPreparedListener,
     @Override
     public void onChatsReady(List<Chat> chats) {
         isChatsLoaded = true;
+        wasError = false;
         this.chats = chats;
         adapter.updateItems(chats);
 
@@ -83,6 +91,14 @@ public final class ChatListPage extends Page implements OnChatsPreparedListener,
         if (chats.isEmpty()) {
             showView(emptyListLabel);
         }
+    }
+
+    @Override
+    public void onError(VKError vkError) {
+        isChatsLoaded = true;
+        wasError = true;
+        hideView(progressBar);
+        showErrorMessage();
     }
 
     @Override
@@ -102,5 +118,19 @@ public final class ChatListPage extends Page implements OnChatsPreparedListener,
     private void prepareList() {
         recyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
         recyclerView.setAdapter(adapter);
+    }
+
+    private void showErrorMessage() {
+        Snackbar.make(getView(), R.string.list_error, Snackbar.LENGTH_INDEFINITE)
+                .setAction(R.string.ok, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        isChatsLoaded = false;
+                        wasError = false;
+                        showView(progressBar);
+                        updater.requestChats();
+                    }
+                })
+                .show();
     }
 }

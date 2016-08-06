@@ -113,17 +113,17 @@ public class VKApiUser extends VKApiOwner implements android.os.Parcelable {
     /**
      * URL of default square photo of the user with 50 pixels in width.
      */
-    public String photo_50 = "http://vk.com/images/camera_c.gif";
+    public String photo_50;
 
     /**
      * URL of default square photo of the user with 100 pixels in width.
      */
-    public String photo_100 = "http://vk.com/images/camera_b.gif";
+    public String photo_100;
 
     /**
      * URL of default square photo of the user with 200 pixels in width.
      */
-    public String photo_200 = "http://vk.com/images/camera_a.gif";
+    public String photo_200;
 
 	/**
 	 * URL of default photo of the user with 200 pixels in width.
@@ -160,9 +160,9 @@ public class VKApiUser extends VKApiOwner implements android.os.Parcelable {
         online = ParseUtils.parseBoolean(from, FIELD_ONLINE);
         online_mobile = ParseUtils.parseBoolean(from, FIELD_ONLINE_MOBILE);
 
-	    photo_50 = addSquarePhoto(from.optString(FIELD_PHOTO_50, photo_50), 50);
-	    photo_100 = addSquarePhoto(from.optString(FIELD_PHOTO_100, photo_100), 100);
-	    photo_200 = addSquarePhoto(from.optString(FIELD_PHOTO_200, photo_200), 200);
+	    photo_50 = addSquarePhoto(from.optString(FIELD_PHOTO_50), 50);
+	    photo_100 = addSquarePhoto(from.optString(FIELD_PHOTO_100), 100);
+	    photo_200 = addSquarePhoto(from.optString(FIELD_PHOTO_200), 200);
 
 	    photo_400_orig = from.optString(FIELD_PHOTO_400_ORIGIN, photo_400_orig);
 	    photo_max = from.optString(FIELD_PHOTO_MAX, photo_max);

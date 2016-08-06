@@ -17,7 +17,7 @@ import static com.github.programmerr47.vkdiscussionviewer.VkApplication.globalSt
  * @author Michael Spitsin
  * @since 2016-08-02
  */
-public class MessageListAdapter extends RecyclerView.Adapter {
+public class MessageListAdapter extends RecyclerView.Adapter implements MessageItemNotifier {
     private static final LoadingItem LOADING_ITEM = new LoadingItem();
 
     private final AdapterItemsUpdater updater = new AdapterItemsUpdater(this);
@@ -56,6 +56,14 @@ public class MessageListAdapter extends RecyclerView.Adapter {
         return chatItems.size();
     }
 
+    @Override
+    public void onItemChanged(MessageItem item) {
+        int index = chatItems.indexOf(item);
+        if (index != -1) {
+            notifyItemChanged(index);
+        }
+    }
+
     public void showLoading() {
         chatItems.add(LOADING_ITEM);
         notifyItemInserted(chatItems.size() - 1);
@@ -67,6 +75,7 @@ public class MessageListAdapter extends RecyclerView.Adapter {
     }
 
     public void rewrite(List<ChatItem> newItems) {
+        prepareMessageItems(newItems);
         int oldSize = chatItems.size();
         chatItems.clear();
         chatItems.addAll(newItems);
@@ -74,23 +83,17 @@ public class MessageListAdapter extends RecyclerView.Adapter {
     }
 
     public void addSmallPartToBegin(List<ChatItem> items) {
+        prepareMessageItems(items);
+        int additionalCount = addDateIfNeeded(items, chatItems);
+
         chatItems.addAll(0, items);
-        notifyItemRangeInserted(0, items.size());
+        notifyItemRangeInserted(0, items.size() + additionalCount);
     }
 
     public void addItems(List<ChatItem> newItems) {
+        prepareMessageItems(newItems);
         int offset = chatItems.size();
-        MessageItem lastMessage = getDisplayingMessage(chatItems.size() - 1);
-        MessageItem firstNewMessage = getMessage(newItems, 0);
-
-        int additionalCount = 0;
-        if (lastMessage != null && firstNewMessage != null) {
-            int comparison = DateUtils.compareDatesByDay(lastMessage.getDate(), firstNewMessage.getDate());
-            if (comparison != 0) {
-                chatItems.add(new DateItem(lastMessage.getDate()));
-                additionalCount = 1;
-            }
-        }
+        int additionalCount = addDateIfNeeded(chatItems, newItems);
 
         chatItems.addAll(newItems);
         notifyItemRangeInserted(offset, newItems.size() + additionalCount);
@@ -105,11 +108,37 @@ public class MessageListAdapter extends RecyclerView.Adapter {
         }
     }
 
+    private void prepareMessageItems(List<ChatItem> items) {
+        for (int i = 0; i < items.size(); i++) {
+            ChatItem item = items.get(i);
+            if (item instanceof MessageItem) {
+                MessageItem messageItem = (MessageItem) item;
+                messageItem.setNotifier(this);
+            }
+        }
+    }
+
     private MessageItem getDisplayingMessage(int index) {
         return getMessage(chatItems, index);
     }
 
-    private MessageItem getMessage(List<ChatItem> chatItems, int index) {
+    private static int addDateIfNeeded(List<ChatItem> firstPart, List<ChatItem> secondPart) {
+        MessageItem lastMessage = getMessage(firstPart, firstPart.size() - 1);
+        MessageItem firstNewMessage = getMessage(secondPart, 0);
+
+        int additionalCount = 0;
+        if (lastMessage != null && firstNewMessage != null) {
+            int comparison = DateUtils.compareDatesByDay(lastMessage.getDate(), firstNewMessage.getDate());
+            if (comparison != 0) {
+                firstPart.add(new DateItem(lastMessage.getDate()));
+                additionalCount = 1;
+            }
+        }
+
+        return additionalCount;
+    }
+
+    private static MessageItem getMessage(List<ChatItem> chatItems, int index) {
         if (index > 0 && chatItems.get(index) instanceof MessageItem) {
             return (MessageItem) chatItems.get(index);
         } else {

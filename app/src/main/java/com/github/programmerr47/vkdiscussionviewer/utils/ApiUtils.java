@@ -2,13 +2,18 @@ package com.github.programmerr47.vkdiscussionviewer.utils;
 
 import android.text.TextUtils;
 
+import com.github.programmerr47.vkdiscussionviewer.model.User;
 import com.vk.sdk.api.model.VKApiMessage;
 import com.vk.sdk.api.model.VKApiPhotoSize;
 import com.vk.sdk.api.model.VKAttachments;
 import com.vk.sdk.api.model.VKAttachments.VKApiAttachment;
 import com.vk.sdk.api.model.VKPhotoSizes;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static android.text.TextUtils.isEmpty;
+import static com.github.programmerr47.vkdiscussionviewer.VkApplication.globalStorage;
 import static com.github.programmerr47.vkdiscussionviewer.utils.AndroidUtils.dp;
 import static com.vk.sdk.api.model.VKAttachments.TYPE_ALBUM;
 import static com.vk.sdk.api.model.VKAttachments.TYPE_APP;

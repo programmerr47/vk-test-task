@@ -2,7 +2,6 @@ package com.github.programmerr47.vkdiscussionviewer.chatlistpage;
 
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 import android.util.SparseArray;
 
 import com.github.programmerr47.vkdiscussionviewer.utils.ApiUtils;
@@ -37,31 +36,50 @@ public class RetrieveChatsTask implements Runnable {
     private List<Chat> items = new ArrayList<>();
     private SparseArray<Chat> itemMap = new SparseArray<>();
 
+    private Runnable delayedPostAction;
+
     public RetrieveChatsTask(OnChatsReceivedListener listener) {
         weakListener = new WeakReference<>(listener);
     }
 
     @Override
     public void run() {
-        Looper.prepare();
+        if (Looper.myLooper() == null) {
+            Looper.prepare();
+        }
         handler = new Handler();
-        requestDialogsPart(0);
+        if (delayedPostAction != null) {
+            handler.post(delayedPostAction);
+            delayedPostAction = null;
+        }
         Looper.loop();
+    }
+
+    public void request() {
+        Runnable postAction = new Runnable() {
+            @Override
+            public void run() {
+                requestDialogsPart(0);
+            }
+        };
+
+        if (handler == null) {
+            delayedPostAction = postAction;
+        } else {
+            handler.post(postAction);
+        }
     }
 
     //TODO add labeling attachments (because of empty body field)
     private void requestDialogsPart(final int offset) {
-        Log.v("FUCK", "requestDialogsPArt " + offset);
         VKApi.messages().getDialogs(VKParameters.from("offset", offset, "count", PART_COUNT)).executeSyncWithListener(new VKRequest.VKRequestListener() {
             @Override
             public void onComplete(final VKResponse response) {
                 super.onComplete(response);
-                Log.v("FUCK", "requestDialogsPArt response " + offset);
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
                         VKList<VKApiDialog> dialogs = ((VKApiGetDialogResponse) response.parsedModel).items;
-                        Log.v("FUCK", "requestDialogsPArt response in handler dialogsize = " + dialogs.size());
                         for (int i = 0; i < dialogs.size(); i++) {
                             VKApiMessage message = dialogs.get(i).message;
                             if (message.chat_id != 0) {
@@ -97,7 +115,8 @@ public class RetrieveChatsTask implements Runnable {
                         }
                     }, 500);
                 } else {
-                    postResult();
+//                    postResult();
+                    postError(error);
                 }
 
             }
@@ -134,6 +153,17 @@ public class RetrieveChatsTask implements Runnable {
             public void run() {
                 if (weakListener.get() != null) {
                     weakListener.get().onChatsReceived(items, itemMap);
+                }
+            }
+        });
+    }
+
+    private void postError(final VKError error) {
+        uiHandler().post(new Runnable() {
+            @Override
+            public void run() {
+                if (weakListener.get() != null) {
+                    weakListener.get().onError(error);
                 }
             }
         });

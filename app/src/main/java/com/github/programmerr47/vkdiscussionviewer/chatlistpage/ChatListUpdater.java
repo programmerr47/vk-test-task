@@ -29,22 +29,24 @@ import static com.vk.sdk.VKAccessToken.currentToken;
  * @author Michael Spitsin
  * @since 2016-07-31
  */
+//TODO rewrite using HandlerThread
 public class ChatListUpdater implements OnChatsReceivedListener {
     private final ExecutorService requestExecutor = Executors.newSingleThreadExecutor();
 
     private final OnChatsPreparedListener listener;
-    private Future currentTask;
+    private RetrieveChatsTask task;
 
     public ChatListUpdater(OnChatsPreparedListener listener) {
         this.listener = listener;
     }
 
     public void requestChats() {
-        if (currentTask != null) {
-            currentTask.cancel(true);
+        if (task == null) {
+            task = new RetrieveChatsTask(this);
+            requestExecutor.execute(task);
         }
 
-        currentTask = requestExecutor.submit(new RetrieveChatsTask(this));
+        task.request();
     }
 
     @Override
@@ -99,6 +101,7 @@ public class ChatListUpdater implements OnChatsReceivedListener {
             @Override
             public void onError(VKError error) {
                 super.onError(error);
+                listener.onError(error);
             }
 
             @Override
@@ -129,7 +132,12 @@ public class ChatListUpdater implements OnChatsReceivedListener {
         });
     }
 
-    private String toIdSequence(List<Chat> chats) {
+    @Override
+    public void onError(VKError error) {
+        listener.onError(error);
+    }
+
+    private static String toIdSequence(List<Chat> chats) {
         if (chats.isEmpty()) {
             return "";
         }

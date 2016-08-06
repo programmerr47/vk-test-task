@@ -88,7 +88,7 @@ public class ChatPage extends Page implements GetMessagesTask.OnMessagesReceived
     @Override
     public void onMessagesReceived(final int offset, List<ChatItem> chatItems, int taskId) {
         if (taskId == GetMessagesTask.ERROR) {
-            Snackbar.make(getView(), R.string.message_list_error, Snackbar.LENGTH_INDEFINITE)
+            Snackbar.make(getView(), R.string.list_error, Snackbar.LENGTH_INDEFINITE)
                     .setAction(R.string.ok, new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
@@ -139,7 +139,7 @@ public class ChatPage extends Page implements GetMessagesTask.OnMessagesReceived
     }
 
     private void prepareProgress() {
-        if (isMessagesLoading && adapter.getItemCount() == 0) {
+        if (adapter.getItemCount() == 0 && !isHistoryFullyLoaded) {
             progressBar.setVisibility(VISIBLE);
         } else {
             progressBar.setVisibility(GONE);

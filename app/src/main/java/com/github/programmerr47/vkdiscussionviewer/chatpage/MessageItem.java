@@ -6,6 +6,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.github.programmerr47.vkdiscussionviewer.R;
+import com.github.programmerr47.vkdiscussionviewer.VkApplication;
 import com.github.programmerr47.vkdiscussionviewer.model.VkPhotoSet;
 import com.github.programmerr47.vkdiscussionviewer.utils.BindViewHolder;
 import com.github.programmerr47.vkdiscussionviewer.utils.CircleTransform;
@@ -21,6 +22,7 @@ import static android.view.View.VISIBLE;
 import static android.widget.RelativeLayout.ALIGN_PARENT_RIGHT;
 import static android.widget.RelativeLayout.LEFT_OF;
 import static android.widget.RelativeLayout.RIGHT_OF;
+import static com.github.programmerr47.vkdiscussionviewer.VkApplication.uiHandler;
 import static com.vk.sdk.VKAccessToken.currentToken;
 
 /**
@@ -37,6 +39,12 @@ public class MessageItem implements ChatItem<MessageItem.Holder> {
     private String dateFormatted;
     private String content;
     private VkPhotoSet photoSet = new VkPhotoSet();
+
+    private MessageItemNotifier notifier;
+
+    public void setNotifier(MessageItemNotifier notifier) {
+        this.notifier = notifier;
+    }
 
     MessageItem setId(int id) {
         this.id = id;
@@ -67,6 +75,13 @@ public class MessageItem implements ChatItem<MessageItem.Holder> {
     MessageItem setPhotoSet(VkPhotoSet photoSet) {
         this.photoSet = photoSet;
         return this;
+    }
+
+    void updateDelayedAvatar(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
+        if (notifier != null) {
+            notifier.onItemChanged(MessageItem.this);
+        }
     }
 
     @Override

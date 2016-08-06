@@ -1,6 +1,9 @@
 package com.github.programmerr47.vkdiscussionviewer.chatpage;
 
+import android.util.SparseArray;
+
 import com.github.programmerr47.vkdiscussionviewer.model.User;
+import com.github.programmerr47.vkdiscussionviewer.utils.ApiUtils;
 import com.github.programmerr47.vkdiscussionviewer.utils.DateUtils;
 import com.github.programmerr47.vkdiscussionviewer.utils.PhotoSetCreator;
 import com.vk.sdk.api.VKApi;
@@ -8,13 +11,18 @@ import com.vk.sdk.api.VKError;
 import com.vk.sdk.api.VKParameters;
 import com.vk.sdk.api.VKRequest;
 import com.vk.sdk.api.VKResponse;
+import com.vk.sdk.api.methods.VKApiUsers;
 import com.vk.sdk.api.model.VKApiGetMessagesResponse;
 import com.vk.sdk.api.model.VKApiMessage;
+import com.vk.sdk.api.model.VKApiUserFull;
+import com.vk.sdk.api.model.VKList;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -61,11 +69,14 @@ public class GetMessagesTask {
                             @Override
                             public void onComplete(VKResponse response) {
                                 super.onComplete(response);
+                                SparseArray<List<MessageItem>> messagesByUserId = new SparseArray<>();
+
                                 VKApiGetMessagesResponse messagesResponse = (VKApiGetMessagesResponse) response.parsedModel;
                                 List<ChatItem> chatItems = new ArrayList<>();
                                 MessageItem newestCachedMessageItem = getFirstCachedMessage();
                                 long lastDate = -1;
-                                for (VKApiMessage apiMessage : messagesResponse.items) {
+
+                                for (final VKApiMessage apiMessage : messagesResponse.items) {
                                     if (lastDate != -1) {
                                         int comparison = DateUtils.compareDatesByDay(lastDate, apiMessage.date);
                                         if (comparison != 0) {
@@ -79,17 +90,31 @@ public class GetMessagesTask {
                                         return;
                                     }
 
+                                    String avatarUrl;
                                     if (!globalStorage().hasUser(apiMessage.user_id)) {
-                                        globalStorage().cacheUser(new User().setId(apiMessage.user_id));
+                                        avatarUrl = "";
+                                    } else {
+                                        avatarUrl = globalStorage().getUser(apiMessage.user_id).getImageUrl();
                                     }
 
-                                    chatItems.add(new MessageItem()
+                                    MessageItem messageItem = new MessageItem()
                                             .setId(apiMessage.id)
                                             .setUserId(apiMessage.user_id)
-                                            .setAvatarUrl(globalStorage().getUser(apiMessage.user_id).getImageUrl())
+                                            .setAvatarUrl(avatarUrl)
                                             .setDate(apiMessage.date)
                                             .setContent(getMessageContent(apiMessage))
-                                            .setPhotoSet(PhotoSetCreator.createPhotoSet(apiMessage.attachments)));
+                                            .setPhotoSet(PhotoSetCreator.createPhotoSet(apiMessage.attachments));
+
+                                    if (!globalStorage().hasUser(apiMessage.user_id)) {
+                                        if (messagesByUserId.indexOfKey(apiMessage.user_id) < 0) {
+                                            messagesByUserId.put(apiMessage.user_id, new ArrayList<MessageItem>());
+                                        }
+
+                                        messagesByUserId.get(apiMessage.user_id).add(messageItem);
+                                    }
+
+                                    chatItems.add(messageItem);
+
                                     lastDate = apiMessage.date;
                                 }
 
@@ -100,6 +125,7 @@ public class GetMessagesTask {
                                     globalStorage().cachePart(chatId, chatItems);
                                     GetMessagesTask.this.notify(offset, chatItems, APPEND_NEW_ITEMS);
                                 }
+                                uploadMissingUsers(messagesByUserId);
                             }
 
                             @Override
@@ -143,6 +169,49 @@ public class GetMessagesTask {
                 }
             }
         });
+    }
+
+    private void uploadMissingUsers(final SparseArray<List<MessageItem>> messagesByUserId) {
+        if (messagesByUserId.size() != 0) {
+            final String idSequence = toIdSequence(messagesByUserId);
+            executorService.execute(new Runnable() {
+                @Override
+                public void run() {
+                    VKApi.users()
+                            .get(VKParameters.from("user_ids", idSequence, "fields", "photo,photo_50,photo_100,photo_200"))
+                            .executeSyncWithListener(new VKRequest.VKRequestListener() {
+                                @Override
+                                public void onComplete(VKResponse response) {
+                                    super.onComplete(response);
+                                    VKList<VKApiUserFull> apiUsers = (VKList<VKApiUserFull>) response.parsedModel;
+                                    for (final VKApiUserFull apiUser : apiUsers) {
+                                        final String photoUrl = ApiUtils.getAppropriateAvatarUrl(apiUser.photo);
+                                        globalStorage().cacheUser(new User().setId(apiUser.id).setImageUrl(photoUrl));
+
+                                        uiHandler().post(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                List<MessageItem> messageItems = messagesByUserId.get(apiUser.id);
+                                                for (int i = 0; i < messageItems.size(); i++) {
+                                                    messageItems.get(i).updateDelayedAvatar(photoUrl);
+                                                }
+                                            }
+                                        });
+                                    }
+                                }
+                            });
+                }
+            });
+        }
+    }
+
+    private static String toIdSequence(SparseArray<List<MessageItem>> messagesByUserId) {
+        StringBuilder resultBuilder = new StringBuilder("" + messagesByUserId.keyAt(0));
+        for (int i = 1; i < messagesByUserId.size(); i++) {
+            resultBuilder.append(",").append(messagesByUserId.keyAt(i));
+        }
+
+        return resultBuilder.toString();
     }
 
     public interface OnMessagesReceivedListener {

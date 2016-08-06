@@ -1,5 +1,7 @@
 package com.github.programmerr47.vkdiscussionviewer.chatlistpage;
 
+import com.vk.sdk.api.VKError;
+
 import java.util.List;
 
 /**
@@ -8,4 +10,5 @@ import java.util.List;
  */
 public interface OnChatsPreparedListener {
     void onChatsReady(List<Chat> chats);
+    void onError(VKError vkError);
 }
