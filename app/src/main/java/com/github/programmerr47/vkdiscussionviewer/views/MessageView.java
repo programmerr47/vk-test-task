@@ -69,6 +69,10 @@ public class MessageView extends View {
     private StaticLayout textLayout;
     private StaticLayout timeLayout;
 
+    private int timeOffset;
+    private int avatarOffset;
+    private int bgXOffset;
+
     public MessageView(Context context) {
         super(context);
         init();
@@ -113,7 +117,6 @@ public class MessageView extends View {
         if (!message.isOwner() && !isEmpty(message.getAvatarUrl())) {
             avatarDrawable.draw(canvas);
         }
-        int avatarOffset = message.isOwner() || isEmpty(message.getAvatarUrl()) ? 0 : avatarSize;
 
         canvas.save();
         canvas.translate(0, getMeasuredHeight() - timeLayout.getHeight() - timeDistance);
@@ -122,16 +125,17 @@ public class MessageView extends View {
         }
         timeLayout.draw(canvas);
         canvas.restore();
-        int timeOffset = message.isOwner() ? timeLayout.getWidth() + (int)timeDistance : 0;
 
-        int bgXOffset = bgBoundsWidth / 2 + (message.isOwner() ? 0 : bgTongueWidth);
         canvas.save();
         canvas.translate(avatarOffset + timeOffset, 0);
         currentBackground.draw(canvas);
         canvas.restore();
 
         drawText(canvas, bgXOffset + avatarOffset + timeOffset);
-        drawPhotoSet(canvas, bgXOffset + avatarOffset + timeOffset);
+
+        for (int i = 0; i < photoSetDrawables.length; i++) {
+            photoSetDrawables[i].draw(canvas);
+        }
     }
 
     private void drawText(Canvas canvas, int bgXOffset) {
@@ -144,22 +148,6 @@ public class MessageView extends View {
             canvas.restore();
         }
     }
-
-    private void drawPhotoSet(Canvas canvas, int bgXOffset) {
-        canvas.save();
-        canvas.translate(bgXOffset, bgBoundsHeight / 2);
-
-        if (textLayout != null) {
-            canvas.translate(0, textLayout.getHeight() + 2 * textMarginVertical);
-        }
-
-        for (int i = 0; i < photoSetDrawables.length; i++) {
-            photoSetDrawables[i].draw(canvas);
-        }
-
-        canvas.restore();
-    }
-
 
     @Override
     protected boolean verifyDrawable(Drawable drawable) {
@@ -199,6 +187,10 @@ public class MessageView extends View {
         } else {
             textLayout = null;
         }
+
+        avatarOffset = message.isOwner() || isEmpty(message.getAvatarUrl()) ? 0 : this.avatarSize;
+        timeOffset = message.isOwner() ? timeLayout.getWidth() + (int)timeDistance : 0;
+        bgXOffset = bgBoundsWidth / 2 + (message.isOwner() ? 0 : bgTongueWidth);
 
         setBackgroundBounds();
         updatePhotos(message);
@@ -245,14 +237,22 @@ public class MessageView extends View {
     }
 
     private void load(VkPhotoSet photoSet) {
+        int photoSetXOffset = bgXOffset + avatarOffset + timeOffset;
+        int photoSetYOffset = bgBoundsHeight / 2;
+        if (textLayout != null) {
+            photoSetYOffset += textLayout.getHeight() + 2 * textMarginVertical;
+        }
+
         photoSetDrawables = new Drawable[photoSet.size()];
         targets = new BitmapTarget[photoSet.size()];
         for (int i = 0; i < photoSet.size(); i++) {
             Drawable placeholderDrawable = new ColorDrawable(0xffaaaaaa);
-            placeholderDrawable.setBounds(photoSet.photoRect(i));
+            Rect originRect = photoSet.photoRect(i);
+            placeholderDrawable.setBounds(
+                    originRect.left + photoSetXOffset, originRect.top + photoSetYOffset,
+                    originRect.right + photoSetXOffset, originRect.bottom + photoSetYOffset);
             photoSetDrawables[i] = placeholderDrawable;
 
-            Log.v("FUCK", "Load for " + i + " image is started");
             targets[i] = new BitmapTarget(i, this);
             Picasso.with(null).load(photoSet.getPhoto(i).getUrl()).into(targets[i]);
         }
@@ -347,6 +347,7 @@ public class MessageView extends View {
         }
 
         private void changeDrawable(Drawable drawable) {
+            Log.v("FUCK", "ChangeDrawable, Bounds: " + getTargetViewDrawable().getBounds() + " anothre: " + drawable.getBounds() + " drawable: " + drawable);
             Rect bounds = getTargetViewDrawable().getBounds();
             drawable.setBounds(bounds);
 
