@@ -19,10 +19,10 @@ public class VkPageTransformerAuto implements ViewPager.PageTransformer {
         View pageVeilView = page.findViewById(R.id.veil);
         pageVeilView.setAlpha(0);
 
-        if (position < 0 && position > -1) {
+        if (position < 0) {
             int pageWidth = page.getWidth();
             float translateValue = position * -pageWidth;
-            if (translateValue > -pageWidth) {
+            if (translateValue < pageWidth) {
                 translationX = translateValue;
             } else {
                 translationX = 0;

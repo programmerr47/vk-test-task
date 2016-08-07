@@ -347,7 +347,6 @@ public class MessageView extends View {
         }
 
         private void changeDrawable(Drawable drawable) {
-            Log.v("FUCK", "ChangeDrawable, Bounds: " + getTargetViewDrawable().getBounds() + " anothre: " + drawable.getBounds() + " drawable: " + drawable);
             Rect bounds = getTargetViewDrawable().getBounds();
             drawable.setBounds(bounds);
 

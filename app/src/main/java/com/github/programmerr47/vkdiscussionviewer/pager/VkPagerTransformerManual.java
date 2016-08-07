@@ -1,6 +1,7 @@
 package com.github.programmerr47.vkdiscussionviewer.pager;
 
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.View;
 
 import com.github.programmerr47.vkdiscussionviewer.R;
@@ -18,14 +19,14 @@ public class VkPagerTransformerManual implements ViewPager.PageTransformer {
         final float translationX;
         View pageVeilView = page.findViewById(R.id.veil);
 
-        if (position < 0 && position > -1) {
+        if (position < 0) {
             // this is the page to the left
             float alpha = Math.min(MAX_ALPHA_SLIDE, Math.abs(position));
             pageVeilView.setAlpha(alpha);
 
             int pageWidth = page.getWidth();
             float translateValue = position * -pageWidth;
-            if (translateValue > -pageWidth) {
+            if (translateValue < pageWidth) {
                 translationX = translateValue;
             } else {
                 translationX = 0;
