@@ -107,11 +107,12 @@ public class ChatPage extends Page implements GetMessagesTask.OnMessagesReceived
                 hideView(progressBar);
             }
 
+            if (chatItems.isEmpty() || chatItems.get(chatItems.size() - 1) instanceof DateItem) {
+                isHistoryFullyLoaded = true;
+            }
 
             if (chatItems.isEmpty()) {
                 if (taskId == GetMessagesTask.APPEND_NEW_ITEMS) {
-                    isHistoryFullyLoaded = true;
-
                     if (adapter.getItemCount() == 0) {
                         showView(emptyMessagesLabel);
                     } else {

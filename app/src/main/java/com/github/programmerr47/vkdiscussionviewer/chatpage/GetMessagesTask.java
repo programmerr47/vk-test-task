@@ -118,6 +118,10 @@ public class GetMessagesTask {
                                     lastDate = apiMessage.date;
                                 }
 
+                                if (messagesResponse.items.size() < MESSAGES_DEFAULT_COUNT && !messagesResponse.items.isEmpty()) {
+                                    chatItems.add(new DateItem(lastDate));
+                                }
+
                                 if (offset == 0 && newestCachedMessageItem != null) {
                                     globalStorage().rewriteChat(chatId, chatItems);
                                     GetMessagesTask.this.notify(offset, chatItems, REWRITE_CACHED);
